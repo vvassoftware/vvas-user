@@ -1,7 +1,12 @@
+import { useNavigate, useLocation } from "react-router-dom";
+
 export default function Navbar() {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
   return (
     <div className="fixed w-full bg-white z-50 bottom-0 left-0 gap-x-16 flex items-center justify-center h-[70px]">
-      <button className="p-2">
+      <button className="p-2" onClick={() => navigate("/")}>
         <svg
           width="24"
           height="24"
@@ -11,11 +16,11 @@ export default function Navbar() {
         >
           <path
             d="M23.2144 20.7495L18.6313 16.0766C18.4244 15.8656 18.144 15.7485 17.8498 15.7485H17.1005C18.3693 14.0939 19.1231 12.0129 19.1231 9.74905C19.1231 4.36364 14.8434 0 9.56157 0C4.27972 0 0 4.36364 0 9.74905C0 15.1345 4.27972 19.4981 9.56157 19.4981C11.7819 19.4981 13.8229 18.7294 15.4456 17.4358V18.1998C15.4456 18.4998 15.5605 18.7857 15.7674 18.9966L20.3505 23.6696C20.7826 24.1101 21.4814 24.1101 21.9089 23.6696L23.2098 22.3431C23.6419 21.9025 23.6419 21.1901 23.2144 20.7495ZM9.56157 15.7485C6.31156 15.7485 3.67753 13.0675 3.67753 9.74905C3.67753 6.43531 6.30696 3.74963 9.56157 3.74963C12.8116 3.74963 15.4456 6.43062 15.4456 9.74905C15.4456 13.0628 12.8162 15.7485 9.56157 15.7485Z"
-            fill="#1B4965"
+            fill={pathname === "/" ? "#1B4965" : "#C0CED8"}
           />
         </svg>
       </button>
-      <button className="p-2">
+      <button className="p-2" onClick={() => navigate("/bookings")}>
         <svg
           width="23"
           height="24"
@@ -25,11 +30,11 @@ export default function Navbar() {
         >
           <path
             d="M4.46677 19.2H22.1065V2.4C22.1065 1.76348 21.8585 1.15303 21.4171 0.702944C20.9756 0.252856 20.3769 0 19.7526 0H4.45264C3.03327 0 0.921875 0.9588 0.921875 3.6V20.4C0.921875 23.0412 3.03327 24 4.45264 24H22.1065V21.6H4.46677C3.92303 21.5856 3.27572 21.366 3.27572 20.4C3.27572 19.434 3.92303 19.2144 4.46677 19.2ZM6.80649 4.8H17.3988V7.2H6.80649V4.8Z"
-            fill="#C0CED8"
+            fill={pathname === "/bookings" ? "#1B4965" : "#C0CED8"}
           />
         </svg>
       </button>
-      <button className="p-2">
+      <button className="p-2" onClick={() => navigate("/bookings")}>
         <svg
           width="25"
           height="24"

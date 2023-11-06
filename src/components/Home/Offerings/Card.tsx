@@ -1,4 +1,4 @@
-export default function Card() {
+export default function Card({ school }: any) {
   return (
     <div className="rounded-md overflow-hidden">
       <div>
@@ -13,7 +13,9 @@ export default function Card() {
         <div className="flex justify-between items-center">
           <div>
             <h3 className="text-sm text-white font-bold">
-              Watersport rental
+              {school.name.length > 10
+                ? `${school.name.slice(0, 10)}..`
+                : school.name}
             </h3>
             <p className="text-xs text-white">Tampa, Florida</p>
           </div>
@@ -62,7 +64,7 @@ export default function Card() {
           </button>
         </div>
 
-        <div className="flex items-center justify-between mt-2">
+        <div className="flex gap-y-1 flex-col mt-1">
           <div className="flex items-center gap-x-1">
             <svg
               width="61"
@@ -95,12 +97,13 @@ export default function Card() {
                 stroke-linejoin="round"
               />
             </svg>
-            <span className="text-white font-bold text-xs">(5)</span>
+            <span className="text-white font-bold text-xs">
+              ({school.stars})
+            </span>
           </div>
-
-          <div className="flex items-center gap-x-1 text-white text-xs">
+          <div className="flex justify-end w-full items-center gap-x-1 text-white text-xs">
             <p>From</p>
-            <span className="font-bold text-sm">$230</span>
+            <span className="font-bold text-sm">${school.price}</span>
           </div>
         </div>
       </div>
