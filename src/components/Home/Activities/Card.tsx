@@ -1,12 +1,10 @@
 export default function Card() {
   return (
-    <div className="relative w-[150px] h-[100px] rounded-md overflow-hidden">
+    <button className="relative w-[150px] h-[100px] rounded-md overflow-hidden">
       <div className="w-full h-full absolute top-0 left-0 bg-black opacity-40" />
 
       <div className="absolute z-50 top-1/2 -translate-x-1/2 -translate-y-1/2 left-1/2">
-        <p className="text-white text-2xl font-bold uppercase">
-          Surf
-        </p>
+        <p className="text-white text-2xl font-bold uppercase">Surf</p>
       </div>
 
       <img
@@ -14,6 +12,6 @@ export default function Card() {
         alt=""
         className="w-full h-full object-cover"
       />
-    </div>
+    </button>
   );
 }
