@@ -38,27 +38,39 @@ export default function Profile() {
       </header>
 
       <div className="px-5">
-        <h3 className="text-xl text-darkBlue font-bold">Steve Ballmer</h3>
+        <h3 className="text-xl text-darkBlue font-bold">
+          Steve Ballmer
+        </h3>
         <p className="text-[#333]">steveballmer@outlook.com</p>
       </div>
 
       <div className="px-5 mt-5">
-        <h3 className="text-[28px] font-bold text-darkBlue">Settings</h3>
+        <h3 className="text-[28px] font-bold text-darkBlue">
+          Settings
+        </h3>
 
         <div className="mt-3">
           <Button title="Past bookings" route="/past-bookings" />
-          <Button title="Payment methods" route="/past-bookings" />
-          <Button title="Hours and classes remaining" route="/past-bookings" />
+          <Button title="Payment methods" route="/payments-methods" />
+          <Button
+            title="Hours and classes remaining"
+            route="/hours-remaining"
+          />
         </div>
       </div>
 
       <div className="px-5 mt-[30px]">
-        <h3 className="text-[28px] font-bold text-darkBlue">Settings</h3>
+        <h3 className="text-[28px] font-bold text-darkBlue">
+          About us
+        </h3>
 
         <div className="mt-3">
-          <Button title="Past bookings" route="/past-bookings" />
-          <Button title="Payment methods" route="/past-bookings" />
-          <Button title="Hours and classes remaining" route="/past-bookings" />
+          <Button title="Want to be featured here?" route="" />
+          <Button
+            externalLink
+            title="Legal terms we all love"
+            route="https://www.vvassoftware.com/tos"
+          />
         </div>
       </div>
     </Layout>
