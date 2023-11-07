@@ -7,6 +7,7 @@ import Profile from "../screens/Profile";
 import PastBookings from "../screens/Settings/PastBookings";
 import PaymentsMethods from "../screens/Settings/PaymentsMethods";
 import HoursRemaining from "../screens/Settings/HoursRemaining";
+import Login from "../screens/Auth/Login";
 
 export default function RoutesApp() {
   return (
@@ -23,6 +24,9 @@ export default function RoutesApp() {
           element={<PaymentsMethods />}
         />
         <Route path="/hours-remaining" element={<HoursRemaining />} />
+
+        {/* Auth */}
+        <Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>
   );
