@@ -1,9 +1,54 @@
+import * as Dialog from "@radix-ui/react-dialog";
+
 import Button from "../components/Footer/Button";
 import Layout from "../components/Layout";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
+  const navigate = useNavigate();
+  const [showModalLogout, setShowModalLogout] =
+    useState<boolean>(false);
+
   return (
     <Layout>
+      <Dialog.Root open={showModalLogout}>
+        <Dialog.Trigger />
+        <Dialog.Portal>
+          <Dialog.Overlay
+            className="DialogOverlay"
+            onClick={() => setShowModalLogout(false)}
+          />
+
+          <Dialog.Content className="DialogContent">
+            <h3 className="text-2xl text-darkBlue font-bold">
+              You want to log out?
+            </h3>
+
+            <p className="text-neutral-700 mt-2">
+              Doing so will result in you being logged out of your
+              account and will need to log in again to access it
+              again.
+            </p>
+
+            <div className="flex items-center gap-x-3 mt-4">
+              <button
+                onClick={() => setShowModalLogout(false)}
+                className="font-medium text-darkBlue border w-full border-darkBlue/90 h-[50px] rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                className="font-medium text-white w-full bg-darkBlue h-[50px] rounded-md"
+                onClick={() => navigate("/login")}
+              >
+                Yes, leave
+              </button>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
       <header className="flex justify-between items-start p-5">
         <button>
           <svg
@@ -21,7 +66,10 @@ export default function Profile() {
           </svg>
         </button>
 
-        <button className="bg-darkBlue grid place-items-center w-[50px] h-[50px] rounded-md">
+        <button
+          className="bg-darkBlue grid place-items-center w-[50px] h-[50px] rounded-md"
+          onClick={() => setShowModalLogout(true)}
+        >
           <svg
             width="24"
             height="24"

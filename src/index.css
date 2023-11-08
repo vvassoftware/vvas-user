@@ -20,3 +20,28 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+.DialogOverlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.DialogContent {
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+    hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: 450px;
+  z-index: 150;
+  max-height: 85vh;
+  padding: 20px;
+  animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
