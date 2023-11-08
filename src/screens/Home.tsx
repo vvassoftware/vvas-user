@@ -2,6 +2,7 @@ import Header from "../components/Home/Header";
 import ActivitiesCard from "../components/Home/Activities/Card";
 import OfferingCard from "../components/Home/Offerings/Card";
 import Layout from "../components/Layout";
+import { useNavigate } from "react-router-dom";
 
 const activities = [
   {
@@ -55,6 +56,8 @@ const activities = [
 ];
 
 export default function Home() {
+  const navigate = useNavigate();
+
   return (
     <Layout>
       <Header />
@@ -88,7 +91,13 @@ export default function Home() {
         <div className="hide-scrollbar overflow-x-auto mt-3">
           <div className="grid grid-cols-2 gap-y-4 gap-x-3">
             {activities.map((school, index: number) => (
-              <OfferingCard key={index} school={school} />
+              <div
+                key={index}
+                className="cursor-pointer"
+                onClick={() => navigate("/booking/1")}
+              >
+                <OfferingCard school={school} />
+              </div>
             ))}
           </div>
         </div>

@@ -11,6 +11,8 @@ import HoursRemaining from "../screens/Settings/HoursRemaining";
 import Login from "../screens/Auth/Login";
 import Register from "../screens/Auth/Register";
 
+import Details from "../screens/Booking/Details";
+
 export default function RoutesApp() {
   return (
     <BrowserRouter>
@@ -30,6 +32,9 @@ export default function RoutesApp() {
         {/* Auth */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        {/* Main */}
+        <Route path="/booking/:id" element={<Details />} />
       </Routes>
     </BrowserRouter>
   );
