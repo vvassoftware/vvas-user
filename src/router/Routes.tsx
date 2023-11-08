@@ -7,7 +7,9 @@ import Profile from "../screens/Profile";
 import PastBookings from "../screens/Settings/PastBookings";
 import PaymentsMethods from "../screens/Settings/PaymentsMethods";
 import HoursRemaining from "../screens/Settings/HoursRemaining";
+
 import Login from "../screens/Auth/Login";
+import Register from "../screens/Auth/Register";
 
 export default function RoutesApp() {
   return (
@@ -27,6 +29,7 @@ export default function RoutesApp() {
 
         {/* Auth */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </BrowserRouter>
   );

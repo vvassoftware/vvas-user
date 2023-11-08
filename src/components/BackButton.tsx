@@ -27,7 +27,7 @@ export default function BackButton({ title }: BackButtonProps) {
         </svg>
       </button>
 
-      <span className="text-darkBlue text-2xl font-medium">
+      <span className="text-darkBlue text-xl font-medium">
         {title}
       </span>
     </div>

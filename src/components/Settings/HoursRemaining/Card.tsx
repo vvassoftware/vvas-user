@@ -3,20 +3,20 @@ const image =
 
 export default function Card() {
   return (
-    <button className="text-left flex h-[120px]">
-      <div className="h-full flex-[150px] rounded-tl-md rounded-bl-md overflow-hidden">
+    <button className="text-left grid grid-cols-[130px_1fr] h-[120px]">
+      <div className="h-full rounded-tl-md rounded-bl-md overflow-hidden">
         <img
           src={image}
           alt=""
           className="w-full h-full object-cover"
         />
       </div>
-      <div className="border-r rounded-tr-md rounded-br-md border-t border-b border-[#9EB3C2] h-full flex w-max flex-col justify-between p-[7px_10px]">
+      <div className="border-r rounded-tr-md rounded-br-md border-t border-b border-[#9EB3C2] h-full flex w-full flex-col justify-between p-[7px_10px]">
         <div>
-          <h3 className="font-bold text-darkBlue uppercase">
+          <h3 className="font-bold text-darkBlue uppercase text-sm">
             Florida Ski School
           </h3>
-          <p className="text-darkBlue text-sm">Orlando, Florida</p>
+          <p className="text-darkBlue text-xs">Orlando, Florida</p>
         </div>
         <div className="flex flex-col">
           <span className="text-right text-3xl font-bold text-darkBlue">

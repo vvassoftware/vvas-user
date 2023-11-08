@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { useHeight } from "../../hooks/useHeight";
-import Input from "../../ui/Input";
 
-export default function Login() {
+import Input from "../../ui/Input";
+import { useHeight } from "../../hooks/useHeight";
+
+export default function Register() {
   const stylesHeight = useHeight();
 
   return (
@@ -34,7 +35,7 @@ export default function Login() {
               />
             </span>
             <span className="block text-[#333] text-lg">
-              Login with Google
+              Register with Google
             </span>
           </button>
 
@@ -50,30 +51,33 @@ export default function Login() {
               />
             </span>
             <span className="block text-[#333] text-lg">
-              Login with Facebook
+              Register with Facebook
             </span>
           </button>
 
           <button type="button" className="text-center text-[#333]">
-            or login with your email
+            or register with your email
           </button>
         </div>
 
         <div className="flex flex-col gap-y-3">
+          <Input placeholder="Name" />
+          <Input placeholder="Lastname" />
           <Input placeholder="Email" />
           <Input placeholder="Password" />
+          <Input placeholder="Repeat your password" />
         </div>
       </div>
 
       <div className="flex flex-col gap-y-4">
         <button className="h-[50px] rounded-md bg-darkBlue text-white font-medium text-lg">
-          Login
+          Register
         </button>
 
         <span className="text-center">
-          If you don't have an account,{" "}
-          <Link to="/register" className="text-darkBlue underline">
-            register
+          If you already have an account,{" "}
+          <Link to="/login" className="text-darkBlue underline">
+            login
           </Link>
         </span>
       </div>
