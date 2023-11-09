@@ -23,8 +23,19 @@ const colStartClasses = [
   "col-start-7",
 ];
 
-// eslint-disable-next-line
-const Calendar = ({ selectedDay, setSelectedDay }: any) => {
+interface CalendarProps {
+  selectedDay: string;
+  setSelectedDay: (value: string) => void;
+  setShowModalBooking: (value: boolean) => void;
+  setShowModalCalendar: (value: boolean) => void;
+}
+
+const Calendar = ({
+  selectedDay,
+  setSelectedDay,
+  setShowModalBooking,
+  setShowModalCalendar,
+}: CalendarProps) => {
   const today = dayjs().startOf("day");
   const [currentMonth, setCurrentMonth] = useState(
     today.format("YYYY-MM-DD")
@@ -101,12 +112,6 @@ const Calendar = ({ selectedDay, setSelectedDay }: any) => {
     <div className="max-w-sm">
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {/* <button
-            onClick={previousYear}
-            className="border border-gray-300 text-sm text-darkBlue rounded-md shadow-sm p-3"
-          >
-            <FaAnglesLeft />
-          </button> */}
           <button
             onClick={previousMonth}
             className="border border-gray-300 text-sm text-darkBlue rounded-md shadow-sm p-3"
@@ -124,12 +129,6 @@ const Calendar = ({ selectedDay, setSelectedDay }: any) => {
           >
             <FaAngleRight />
           </button>
-          {/* <button
-            onClick={nextYear}
-            className="border border-gray-300 text-sm text-darkBlue rounded-md shadow-sm p-3"
-          >
-            <FaAnglesRight />
-          </button> */}
         </div>
       </div>
 
@@ -149,6 +148,8 @@ const Calendar = ({ selectedDay, setSelectedDay }: any) => {
             <div
               onClick={() => {
                 setSelectedDay(dayjs(day).format("YYYY-MM-DD"));
+                setShowModalCalendar(false);
+                setShowModalBooking(true);
               }}
               key={day.toString()}
               className={classNames(

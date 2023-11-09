@@ -5,8 +5,10 @@ import BackButton from "../../components/BackButton";
 import ActivitiesCard from "../../components/Home/Activities/Card";
 import PackagesCard from "../../components/Home/Packages/Card";
 import Review from "../../components/Details/Review";
-import Modal from "../../ui/Modal";
 import Calendar from "../../components/Calendar";
+import CardBookingHours from "../../components/Details/Booking/Card";
+import Modal from "../../ui/Modal";
+import { useHeight } from "../../hooks/useHeight";
 
 const activities = [
   {
@@ -63,10 +65,15 @@ const packages = ["", "", "", ""];
 
 export default function Details() {
   const currentDate = dayjs();
+  const { height } = useHeight();
+  const valueHeight = +height.split("rem")[0] * 16;
+  console.log(valueHeight);
 
   const [showModalCalendar, setShowModalCalendar] =
     useState<boolean>(false);
-  // eslint-disable-next-line
+  const [showModalBooking, setShowModalBooking] =
+    useState<boolean>(false);
+
   const [selectedDay, setSelectedDay] = useState<string>(
     dayjs().format()
   );
@@ -95,7 +102,7 @@ export default function Details() {
     <div className="mb-[128px]">
       <Modal show={showModalCalendar} setShow={setShowModalCalendar}>
         <div className="flex items-center justify-between">
-          <h3 className="text-[26px] font-bold text-darkBlue">
+          <h3 className="text-2xl font-bold text-darkBlue">
             Calendar
           </h3>
 
@@ -122,15 +129,166 @@ export default function Details() {
           <Calendar
             selectedDay={selectedDay}
             setSelectedDay={setSelectedDay}
+            setShowModalBooking={setShowModalBooking}
+            setShowModalCalendar={setShowModalCalendar}
           />
         </div>
+      </Modal>
+
+      <Modal show={showModalBooking} setShow={setShowModalBooking}>
+        <div className="flex items-center gap-x-4">
+          <button
+            className="h-10 w-10 bg-darkBlue rounded-md grid place-items-center"
+            onClick={() => {
+              setShowModalBooking(false);
+              setShowModalCalendar(true);
+            }}
+          >
+            <svg
+              width="7"
+              height="11"
+              viewBox="0 0 7 11"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M2.4 5.2L5.9 1.7C6.3 1.3 6.3 0.7 5.9 0.3C5.5 -0.1 4.9 -0.1 4.5 0.3L0.3 4.5C-0.1 4.9 -0.1 5.5 0.3 5.9L4.5 10.1C4.7 10.3 4.9 10.4 5.2 10.4C5.5 10.4 5.7 10.3 5.9 10.1C6.3 9.7 6.3 9.1 5.9 8.7L2.4 5.2Z"
+                fill="white"
+              />
+            </svg>
+          </button>
+
+          <h3
+            className={`${
+              valueHeight <= 740 ? "text-[22px]" : "text-2xl"
+            } font-bold text-darkBlue`}
+          >
+            Select booking hours
+          </h3>
+        </div>
+
+        <div className="flex items-center justify-between mt-4">
+          <button className="p-2">
+            <svg
+              width="10"
+              height="16"
+              viewBox="0 0 10 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M0.336596 6.84188L6.84129 0.337192C7.29088 -0.112397 8.01787 -0.112397 8.46268 0.337192L9.54361 1.41812C9.99319 1.86771 9.99319 2.5947 9.54361 3.03951L4.93771 7.65497L9.54839 12.2656C9.99798 12.7152 9.99798 13.4422 9.54839 13.887L8.46746 14.9727C8.01787 15.4223 7.29088 15.4223 6.84607 14.9727L0.341379 8.46806C-0.112993 8.01847 -0.112993 7.29147 0.336596 6.84188Z"
+                fill="#1B4965"
+              />
+            </svg>
+          </button>
+          <span className="font-bold text-darkBlue text-lg">
+            {dayjs(selectedDay).format("MMMM DD YYYY")}
+          </span>
+          <button className="p-2">
+            <svg
+              width="11"
+              height="16"
+              viewBox="0 0 11 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9.9759 9.15812L3.47121 15.6628C3.02162 16.1124 2.29463 16.1124 1.84982 15.6628L0.768894 14.5819C0.319305 14.1323 0.319305 13.4053 0.768894 12.9605L5.37479 8.34503L0.764112 3.73435C0.314523 3.28476 0.314523 2.55777 0.764112 2.11296L1.84504 1.02725C2.29463 0.577662 3.02162 0.577662 3.46643 1.02725L9.97112 7.53194C10.4255 7.98153 10.4255 8.70853 9.9759 9.15812Z"
+                fill="#1B4965"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div
+          className={`${
+            valueHeight <= 740
+              ? "max-h-[320px]"
+              : valueHeight <= 850
+              ? "max-h-[450px]"
+              : "max-h-full"
+          } bg-lightBlue p-3 mt-4 rounded-md grid grid-cols-3 gap-2 overflow-y-auto`}
+        >
+          <CardBookingHours variant="EXPIRED" />
+          <CardBookingHours variant="EXPIRED" />
+          <CardBookingHours variant="EXPIRED" />
+          <CardBookingHours variant="EXPIRED" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="PARTIALLY" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="PARTIALLY" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="PARTIALLY" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="FREE" />
+          <CardBookingHours variant="FREE" />
+        </div>
+
+        <div className="flex items-center justify-between mt-3">
+          <div className="flex items-center gap-x-2">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10 0C15.523 0 20 4.477 20 10C20 15.523 15.523 20 10 20C4.477 20 0 15.523 0 10C0 4.477 4.477 0 10 0ZM10 2C7.87827 2 5.84344 2.84285 4.34315 4.34315C2.84285 5.84344 2 7.87827 2 10C2 12.1217 2.84285 14.1566 4.34315 15.6569C5.84344 17.1571 7.87827 18 10 18C12.1217 18 14.1566 17.1571 15.6569 15.6569C17.1571 14.1566 18 12.1217 18 10C18 7.87827 17.1571 5.84344 15.6569 4.34315C14.1566 2.84285 12.1217 2 10 2ZM10 4C10.2449 4.00003 10.4813 4.08996 10.6644 4.25272C10.8474 4.41547 10.9643 4.63975 10.993 4.883L11 5V9.586L13.707 12.293C13.8863 12.473 13.9905 12.7144 13.9982 12.9684C14.006 13.2223 13.9168 13.4697 13.7488 13.6603C13.5807 13.8508 13.3464 13.9703 13.0935 13.9944C12.8406 14.0185 12.588 13.9454 12.387 13.79L12.293 13.707L9.293 10.707C9.13758 10.5514 9.03776 10.349 9.009 10.131L9 10V5C9 4.73478 9.10536 4.48043 9.29289 4.29289C9.48043 4.10536 9.73478 4 10 4Z"
+                fill="#1B4965"
+              />
+            </svg>
+
+            <span className="font-bold text-darkBlue">
+              08 to 10 am
+            </span>
+          </div>
+
+          <div className="flex items-center gap-x-2">
+            <svg
+              width="12"
+              height="20"
+              viewBox="0 0 12 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M7 4H5V5C5 5.26522 5.10536 5.51957 5.29289 5.70711C5.48043 5.89464 5.73478 6 6 6C6.26522 6 6.51957 5.89464 6.70711 5.70711C6.89464 5.51957 7 5.26522 7 5V4Z"
+                fill="#1B4965"
+              />
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M0 0V2H1V5C1 6.32608 1.52678 7.59785 2.46447 8.53553C3.40215 9.47322 4.67392 10 6 10C4.67392 10 3.40215 10.5268 2.46447 11.4645C1.52678 12.4021 1 13.6739 1 15V18H0V20H12V18H11V15C11 13.6739 10.4732 12.4021 9.53553 11.4645C8.59785 10.5268 7.32608 10 6 10C6.65661 10 7.30679 9.87067 7.91342 9.6194C8.52004 9.36812 9.07124 8.99983 9.53553 8.53553C9.99983 8.07124 10.3681 7.52004 10.6194 6.91342C10.8707 6.30679 11 5.65661 11 5V2H12V0H0ZM3 2H9V5C9 5.79565 8.68393 6.55871 8.12132 7.12132C7.55871 7.68393 6.79565 8 6 8C5.20435 8 4.44129 7.68393 3.87868 7.12132C3.31607 6.55871 3 5.79565 3 5V2ZM3 15V18H9V15C9 14.2044 8.68393 13.4413 8.12132 12.8787C7.55871 12.3161 6.79565 12 6 12C5.20435 12 4.44129 12.3161 3.87868 12.8787C3.31607 13.4413 3 14.2044 3 15Z"
+                fill="#1B4965"
+              />
+            </svg>
+            <span className="font-bold text-darkBlue">2 hours</span>
+          </div>
+        </div>
+
+        <button className="font-medium mt-4 h-[50px] bg-darkBlue text-white rounded-md grid place-items-center w-full">
+          Select
+        </button>
       </Modal>
 
       <header className="p-5">
         <BackButton title="Florida Ski School" />
       </header>
 
-      <div className="p-[10px] items-center grid grid-cols-[1fr,145px] fixed bottom-0 left-0 bg-darkBlue w-full h-[100px]">
+      <div className="p-[10px] items-center grid grid-cols-[1fr,145px] z-[100] fixed bottom-0 left-0 bg-darkBlue w-full h-[100px]">
         <div>
           <p className="text-white">
             You have <span className="font-bold">7 hours</span>{" "}
@@ -224,7 +382,7 @@ export default function Details() {
 
         <div className="mt-4">
           <p className="text-center text-darkBlue font-medium text-xl">
-            {currentDate.format("MMMM")}
+            {currentDate.format("MMMM YYYY")}
           </p>
         </div>
 
