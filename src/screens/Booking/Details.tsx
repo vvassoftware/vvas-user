@@ -187,9 +187,11 @@ export default function Details() {
       </Modal>
 
       <Modal show={showModalBooking} setShow={setShowModalBooking}>
-        <div className="flex items-center gap-x-4">
+        <div className="flex items-center gap-x-3">
           <button
-            className="h-10 w-10 bg-darkBlue rounded-md grid place-items-center"
+            className={`${
+              valueHeight <= 740 ? "w-[36px] h-[36px]" : "h-10 w-10"
+            } bg-darkBlue rounded-md grid place-items-center`}
             onClick={() => {
               setShowModalBooking(false);
               setShowModalCalendar(true);
@@ -211,7 +213,7 @@ export default function Details() {
 
           <h3
             className={`${
-              valueHeight <= 740 ? "text-[22px]" : "text-2xl"
+              valueHeight <= 740 ? "text-lg" : "text-2xl"
             } font-bold text-darkBlue`}
           >
             Select booking hours
@@ -233,7 +235,11 @@ export default function Details() {
               />
             </svg>
           </button>
-          <span className="font-bold text-darkBlue text-lg">
+          <span
+            className={`${
+              valueHeight <= 740 ? "text-base" : "text-lg"
+            } font-bold text-darkBlue`}
+          >
             {dayjs(selectedDay).format("MMMM DD YYYY")}
           </span>
           <button className="p-2">
@@ -289,7 +295,7 @@ export default function Details() {
           })}
         </div>
 
-        <div className="flex items-center justify-between mt-4">
+        <div className="-mx-1 flex items-center justify-between mt-4">
           <div className="flex flex-col">
             <div className="flex items-center gap-x-2">
               <svg
@@ -336,7 +342,7 @@ export default function Details() {
               <span className="font-bold">
                 {hoursToBooking.length / 2}
               </span>{" "}
-              hours
+              h
             </span>
           </div>
         </div>
@@ -350,18 +356,17 @@ export default function Details() {
         <BackButton title="Florida Ski School" />
       </header>
 
-      <div className="p-[10px] items-center grid grid-cols-[1fr,145px] z-[100] fixed bottom-0 left-0 bg-darkBlue w-full h-[100px]">
+      <div className="p-[10px] items-center grid grid-cols-[1fr,120px] gap-x-2 z-[100] fixed bottom-0 left-0 bg-darkBlue w-full h-[100px]">
         <div>
-          <p className="text-white">
-            You have <span className="font-bold">7 hours</span>{" "}
-            remaning
+          <p className="text-white text-sm">
+            You have <span className="font-bold">7 h</span> remaning
           </p>
-          <p className="text-white mt-[3px]">
+          <p className="text-white mt-[3px] text-sm">
             <span className="font-bold">Open from:</span> 05am to 08pm
           </p>
         </div>
 
-        <button className="h-[50px] rounded-md bg-white text-darkBlue font-bold px-3">
+        <button className="h-[50px] text-sm rounded-md bg-white text-darkBlue font-bold">
           Make a booking
         </button>
       </div>
@@ -515,7 +520,7 @@ export default function Details() {
 
         <button className="w-full grid place-items-center mt-5">
           <svg
-            width="277"
+            width="200"
             height="33"
             viewBox="0 0 277 33"
             fill="none"
@@ -579,9 +584,7 @@ export default function Details() {
               <h4 className="text-sm font-bold text-darkBlue">
                 Franck Desbouyaux
               </h4>
-              <p className="text-sm text-darkBlue">
-                floridaskischool@gmail.com
-              </p>
+              <p className="text-sm text-darkBlue">Florida, Miami</p>
             </div>
           </div>
 
