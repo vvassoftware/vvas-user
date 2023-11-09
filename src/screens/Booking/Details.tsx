@@ -263,7 +263,7 @@ export default function Details() {
             valueHeight <= 740
               ? "max-h-[320px]"
               : valueHeight <= 850
-              ? "max-h-[450px]"
+              ? "max-h-[400px]"
               : "max-h-full"
           } bg-lightBlue p-3 mt-4 -mx-1 rounded-md grid grid-cols-3 gap-2 overflow-y-auto`}
         >
