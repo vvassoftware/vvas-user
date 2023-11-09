@@ -1,8 +1,22 @@
 interface CardProps {
   variant: "PARTIALLY" | "FREE" | "EXPIRED";
+  startTime: string;
+  // eslint-disable-next-line
+  hoursToBooking: any;
+  endTime: string;
 }
 
-export default function Card({ variant }: CardProps) {
+export default function Card({
+  variant,
+  startTime,
+  hoursToBooking,
+  endTime,
+}: CardProps) {
+  const isSelected = hoursToBooking.find(
+    // eslint-disable-next-line
+    (item: any) => (item.startTime === startTime ? true : false)
+  );
+
   return (
     <div
       className={`${
@@ -11,10 +25,12 @@ export default function Card({ variant }: CardProps) {
           : variant === "EXPIRED"
           ? "bg-[#EA4335]"
           : "bg-[#92ACD3]"
-      } cursor-pointer rounded-sm p-1 flex flex-col gap-y-[2px]`}
+      } ${
+        isSelected ? "ring-darkBlue" : "ring-transparent"
+      } ring-2 cursor-pointer rounded-sm p-1 flex flex-col gap-y-[2px]`}
     >
-      <span
-        className={`block text-xs font-bold ${
+      <div
+        className={`text-xs font-bold ${
           variant === "FREE"
             ? "text-darkBlue"
             : variant === "EXPIRED"
@@ -22,9 +38,15 @@ export default function Card({ variant }: CardProps) {
             : "text-white"
         }`}
       >
-        05<span className="font-normal">am</span> - 06
-        <span className="font-normal">am</span>
-      </span>
+        {startTime.split(" ")[0]}
+        <span className="font-normal lowercase text-[10px]">
+          {startTime.split(" ")[1]}
+        </span>{" "}
+        - {endTime.split(" ")[0]}
+        <span className="font-normal lowercase text-[10px]">
+          {endTime.split(" ")[1]}
+        </span>
+      </div>
       <div className="flex items-center gap-x-1">
         <svg
           width="15"

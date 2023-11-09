@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
 import BackButton from "../../components/BackButton";
@@ -9,6 +9,8 @@ import Calendar from "../../components/Calendar";
 import CardBookingHours from "../../components/Details/Booking/Card";
 import Modal from "../../ui/Modal";
 import { useHeight } from "../../hooks/useHeight";
+
+import { TIME_SCHOOL } from "../../../data/time";
 
 const activities = [
   {
@@ -67,12 +69,14 @@ export default function Details() {
   const currentDate = dayjs();
   const { height } = useHeight();
   const valueHeight = +height.split("rem")[0] * 16;
-  console.log(valueHeight);
 
   const [showModalCalendar, setShowModalCalendar] =
     useState<boolean>(false);
   const [showModalBooking, setShowModalBooking] =
     useState<boolean>(false);
+
+  // eslint-disable-next-line
+  const [hoursToBooking, setHoursToBooking] = useState<any[]>([]);
 
   const [selectedDay, setSelectedDay] = useState<string>(
     dayjs().format()
@@ -97,6 +101,53 @@ export default function Details() {
     startOfWeek.add(12, "days").format("YYYY-MM-DD"),
     startOfWeek.add(13, "days").format("YYYY-MM-DD"),
   ];
+
+  function getSchedule(bookings) {
+    if (bookings.length === 0) {
+      return {
+        startTime: "N/A", // No bookings, so no minimum startTime
+        endTime: "N/A", // No bookings, so no maximum endTime
+      };
+    }
+
+    bookings.sort((a, b) => {
+      return (
+        convertToMinutes(a.startTime) - convertToMinutes(b.startTime)
+      );
+    });
+
+    const lowestStartTime = bookings[0].startTime;
+
+    bookings.sort((a, b) => {
+      return (
+        convertToMinutes(b.endTime) - convertToMinutes(a.endTime)
+      );
+    });
+
+    const highestEndTime = bookings[0].endTime;
+
+    return {
+      startTime: lowestStartTime,
+      endTime: highestEndTime,
+    };
+  }
+
+  function convertToMinutes(time) {
+    const [hour, minutes, period] = time.split(/[:\s]/);
+    let totalMinutes = parseInt(hour) * 60 + parseInt(minutes);
+
+    if (period.toUpperCase() === "PM" && parseInt(hour) !== 12) {
+      totalMinutes += 12 * 60;
+    }
+
+    return totalMinutes;
+  }
+
+  useEffect(() => {
+    setHoursToBooking([]);
+  }, [showModalBooking]);
+
+  const bookingSchedule = getSchedule(hoursToBooking);
 
   return (
     <div className="mb-[128px]">
@@ -208,74 +259,85 @@ export default function Details() {
               : valueHeight <= 850
               ? "max-h-[450px]"
               : "max-h-full"
-          } bg-lightBlue p-3 mt-4 rounded-md grid grid-cols-3 gap-2 overflow-y-auto`}
+          } bg-lightBlue p-3 mt-4 -mx-1 rounded-md grid grid-cols-3 gap-2 overflow-y-auto`}
         >
-          <CardBookingHours variant="EXPIRED" />
-          <CardBookingHours variant="EXPIRED" />
-          <CardBookingHours variant="EXPIRED" />
-          <CardBookingHours variant="EXPIRED" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="PARTIALLY" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="PARTIALLY" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="PARTIALLY" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="FREE" />
-          <CardBookingHours variant="FREE" />
+          {/* eslint-disable-next-line */}
+          {TIME_SCHOOL.map((time: any, index: number) => {
+            return (
+              <div
+                key={index}
+                onClick={() => {
+                  if (hoursToBooking.includes(time)) {
+                    setHoursToBooking((prevValue) =>
+                      prevValue.filter(
+                        (item) => item.starTime !== time.starTime
+                      )
+                    );
+                    return;
+                  }
+                  setHoursToBooking([...hoursToBooking, time]);
+                }}
+              >
+                <CardBookingHours
+                  variant="FREE"
+                  hoursToBooking={hoursToBooking}
+                  startTime={time.startTime}
+                  endTime={time.endTime}
+                />
+              </div>
+            );
+          })}
         </div>
 
-        <div className="flex items-center justify-between mt-3">
-          <div className="flex items-center gap-x-2">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10 0C15.523 0 20 4.477 20 10C20 15.523 15.523 20 10 20C4.477 20 0 15.523 0 10C0 4.477 4.477 0 10 0ZM10 2C7.87827 2 5.84344 2.84285 4.34315 4.34315C2.84285 5.84344 2 7.87827 2 10C2 12.1217 2.84285 14.1566 4.34315 15.6569C5.84344 17.1571 7.87827 18 10 18C12.1217 18 14.1566 17.1571 15.6569 15.6569C17.1571 14.1566 18 12.1217 18 10C18 7.87827 17.1571 5.84344 15.6569 4.34315C14.1566 2.84285 12.1217 2 10 2ZM10 4C10.2449 4.00003 10.4813 4.08996 10.6644 4.25272C10.8474 4.41547 10.9643 4.63975 10.993 4.883L11 5V9.586L13.707 12.293C13.8863 12.473 13.9905 12.7144 13.9982 12.9684C14.006 13.2223 13.9168 13.4697 13.7488 13.6603C13.5807 13.8508 13.3464 13.9703 13.0935 13.9944C12.8406 14.0185 12.588 13.9454 12.387 13.79L12.293 13.707L9.293 10.707C9.13758 10.5514 9.03776 10.349 9.009 10.131L9 10V5C9 4.73478 9.10536 4.48043 9.29289 4.29289C9.48043 4.10536 9.73478 4 10 4Z"
-                fill="#1B4965"
-              />
-            </svg>
+        <div className="flex items-center justify-between mt-4">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-x-2">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7.0026 0.333984C10.6846 0.333984 13.6693 3.31865 13.6693 7.00065C13.6693 10.6827 10.6846 13.6673 7.0026 13.6673C3.3206 13.6673 0.335938 10.6827 0.335938 7.00065C0.335938 3.31865 3.3206 0.333984 7.0026 0.333984ZM7.0026 1.66732C5.58812 1.66732 4.23156 2.22922 3.23137 3.22941C2.23117 4.22961 1.66927 5.58616 1.66927 7.00065C1.66927 8.41514 2.23117 9.77169 3.23137 10.7719C4.23156 11.7721 5.58812 12.334 7.0026 12.334C8.41709 12.334 9.77365 11.7721 10.7738 10.7719C11.774 9.77169 12.3359 8.41514 12.3359 7.00065C12.3359 5.58616 11.774 4.22961 10.7738 3.22941C9.77365 2.22922 8.41709 1.66732 7.0026 1.66732ZM7.0026 3.00065C7.16589 3.00067 7.3235 3.06062 7.44552 3.16913C7.56754 3.27763 7.6455 3.42715 7.6646 3.58932L7.66927 3.66732V6.72465L9.47394 8.52932C9.5935 8.64929 9.66292 8.81027 9.66809 8.97957C9.67326 9.14887 9.61379 9.31379 9.50177 9.44084C9.38975 9.56788 9.23357 9.64752 9.06495 9.66358C8.89634 9.67965 8.72793 9.63092 8.59394 9.52732L8.53127 9.47198L6.53127 7.47198C6.42766 7.36828 6.36111 7.23332 6.34194 7.08798L6.33594 7.00065V3.66732C6.33594 3.49051 6.40618 3.32094 6.5312 3.19591C6.65622 3.07089 6.82579 3.00065 7.0026 3.00065Z"
+                  fill="#1B4965"
+                />
+              </svg>
 
-            <span className="font-bold text-darkBlue">
-              08 to 10 am
-            </span>
+              <span className="font-medium text-darkBlue text-sm lowercase">
+                {bookingSchedule.startTime} to{" "}
+                {bookingSchedule.endTime}
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-x-2">
+          <div className="flex items-center gap-x-1">
             <svg
-              width="12"
-              height="20"
-              viewBox="0 0 12 20"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M7 4H5V5C5 5.26522 5.10536 5.51957 5.29289 5.70711C5.48043 5.89464 5.73478 6 6 6C6.26522 6 6.51957 5.89464 6.70711 5.70711C6.89464 5.51957 7 5.26522 7 5V4Z"
+                d="M8.66927 4H7.33594V4.66667C7.33594 4.84348 7.40618 5.01305 7.5312 5.13807C7.65622 5.2631 7.82579 5.33333 8.0026 5.33333C8.17942 5.33333 8.34898 5.2631 8.47401 5.13807C8.59903 5.01305 8.66927 4.84348 8.66927 4.66667V4Z"
                 fill="#1B4965"
               />
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"
-                d="M0 0V2H1V5C1 6.32608 1.52678 7.59785 2.46447 8.53553C3.40215 9.47322 4.67392 10 6 10C4.67392 10 3.40215 10.5268 2.46447 11.4645C1.52678 12.4021 1 13.6739 1 15V18H0V20H12V18H11V15C11 13.6739 10.4732 12.4021 9.53553 11.4645C8.59785 10.5268 7.32608 10 6 10C6.65661 10 7.30679 9.87067 7.91342 9.6194C8.52004 9.36812 9.07124 8.99983 9.53553 8.53553C9.99983 8.07124 10.3681 7.52004 10.6194 6.91342C10.8707 6.30679 11 5.65661 11 5V2H12V0H0ZM3 2H9V5C9 5.79565 8.68393 6.55871 8.12132 7.12132C7.55871 7.68393 6.79565 8 6 8C5.20435 8 4.44129 7.68393 3.87868 7.12132C3.31607 6.55871 3 5.79565 3 5V2ZM3 15V18H9V15C9 14.2044 8.68393 13.4413 8.12132 12.8787C7.55871 12.3161 6.79565 12 6 12C5.20435 12 4.44129 12.3161 3.87868 12.8787C3.31607 13.4413 3 14.2044 3 15Z"
+                d="M4 1.33398V2.66732H4.66667V4.66732C4.66667 5.55137 5.01786 6.39922 5.64298 7.02434C6.2681 7.64946 7.11595 8.00065 8 8.00065C7.11595 8.00065 6.2681 8.35184 5.64298 8.97696C5.01786 9.60208 4.66667 10.4499 4.66667 11.334V13.334H4V14.6673H12V13.334H11.3333V11.334C11.3333 10.4499 10.9821 9.60208 10.357 8.97696C9.7319 8.35184 8.88406 8.00065 8 8.00065C8.43774 8.00065 8.87119 7.91443 9.27561 7.74692C9.68003 7.5794 10.0475 7.33387 10.357 7.02434C10.6666 6.71481 10.9121 6.34735 11.0796 5.94293C11.2471 5.53851 11.3333 5.10506 11.3333 4.66732V2.66732H12V1.33398H4ZM6 2.66732H10V4.66732C10 5.19775 9.78929 5.70646 9.41421 6.08153C9.03914 6.4566 8.53043 6.66732 8 6.66732C7.46957 6.66732 6.96086 6.4566 6.58579 6.08153C6.21071 5.70646 6 5.19775 6 4.66732V2.66732ZM6 11.334V13.334H10V11.334C10 10.8036 9.78929 10.2948 9.41421 9.91977C9.03914 9.5447 8.53043 9.33398 8 9.33398C7.46957 9.33398 6.96086 9.5447 6.58579 9.91977C6.21071 10.2948 6 10.8036 6 11.334Z"
                 fill="#1B4965"
               />
             </svg>
-            <span className="font-bold text-darkBlue">2 hours</span>
+
+            <span className="font-medium text-darkBlue text-sm">
+              <span className="font-bold">
+                {hoursToBooking.length / 2}
+              </span>{" "}
+              hours
+            </span>
           </div>
         </div>
 
@@ -419,6 +481,12 @@ export default function Details() {
                   ? "bg-darkBlue"
                   : "border-darkBlue/50 border"
               } rounded-md grid place-items-center h-11 w-full`}
+              onClick={() => {
+                if (dayjs(day).isBefore(today, "day")) return;
+
+                setSelectedDay(dayjs(day).format());
+                setShowModalBooking(true);
+              }}
             >
               <span
                 className={`${
