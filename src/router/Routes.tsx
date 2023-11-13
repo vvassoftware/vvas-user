@@ -12,6 +12,7 @@ import Login from "../screens/Auth/Login";
 import Register from "../screens/Auth/Register";
 
 import Details from "../screens/Booking/Details";
+import Method from "../screens/Payments/Method";
 
 export default function RoutesApp() {
   return (
@@ -35,6 +36,7 @@ export default function RoutesApp() {
 
         {/* Main */}
         <Route path="/booking/:id" element={<Details />} />
+        <Route path="/payments" element={<Method />} />
       </Routes>
     </BrowserRouter>
   );

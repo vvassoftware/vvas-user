@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import dayjs from "dayjs";
 
 import BackButton from "../../components/BackButton";
 import ActivitiesCard from "../../components/Home/Activities/Card";
@@ -12,6 +11,7 @@ import { useHeight } from "../../hooks/useHeight";
 import { HiOutlineStar, HiStar } from "react-icons/hi2";
 
 import { TIME_SCHOOL } from "../../../data/time";
+import dayjs from "dayjs";
 
 const activities = [
   {
@@ -153,7 +153,91 @@ export default function Details() {
     setValueStars(0);
   }, [showModalBooking, showModalReview]);
 
+  // eslint-disable-next-line
+  const [reservations, setReservations] = useState<any>([]);
+
+  const handleReservation = (startTime, endTime) => {
+    // Lógica para agregar las reservas que comienzan antes de endTime
+    const newReservations = TIME_SCHOOL.filter(
+      (time) =>
+        time.startTime >= startTime && time.startTime <= endTime
+    );
+
+    setReservations((prevReservations) => [
+      ...prevReservations,
+      ...newReservations,
+    ]);
+  };
+
+  useEffect(() => {
+    if (hoursToBooking.length === 0) {
+      setReservations([]);
+      return;
+    }
+    if (hoursToBooking.length < 1) return;
+
+    if (hoursToBooking.length > 1) {
+      handleReservation(
+        hoursToBooking[1].startTime,
+        hoursToBooking[0].startTime
+      );
+    } else {
+      handleReservation(
+        hoursToBooking[0].startTime,
+        hoursToBooking[0].startTime
+      );
+    }
+  }, [hoursToBooking]);
+
   const bookingSchedule = getSchedule(hoursToBooking);
+
+  const { startTime: lowerValue, endTime: upValue } =
+    hoursToBooking.reduce((acc, curr) => {
+      acc.startTime =
+        !acc.startTime || curr.startTime < acc.startTime
+          ? curr.startTime
+          : acc.startTime;
+
+      acc.endTime =
+        !acc.endTime || curr.endTime > acc.endTime
+          ? curr.endTime
+          : acc.endTime;
+
+      return acc;
+    }, {});
+
+  const initialTime = lowerValue;
+  //  eslint-disable-next-line
+  let endTime: any;
+
+  if (reservations?.length > 1) {
+    endTime = upValue;
+  }
+
+  // eslint-disable-next-line
+  let initialDateTime: any;
+
+  // eslint-disable-next-line
+  let endDateTime: any;
+
+  if (reservations?.length > 0) {
+    // eslint-disable-next-line
+    initialDateTime = dayjs(
+      `${dayjs().format("YYYY-MM-DD")} ${initialTime}`
+    );
+
+    if (reservations?.length > 1) {
+      // eslint-disable-next-line
+      endDateTime = dayjs(
+        `${dayjs().format("YYYY-MM-DD")} ${endTime}`
+      );
+    }
+  }
+
+  const diffHours =
+    endDateTime &&
+    initialDateTime &&
+    endDateTime.diff(initialDateTime, "minute");
 
   return (
     <div className="mb-[128px]">
@@ -227,7 +311,16 @@ export default function Details() {
         </div>
 
         <div className="flex items-center justify-between mt-4">
-          <button className="p-2">
+          <button
+            onClick={() => {
+              const dateSubtrack = dayjs(selectedDay).subtract(
+                1,
+                "day"
+              );
+              setSelectedDay(dayjs(dateSubtrack).format());
+            }}
+            className="p-2"
+          >
             <svg
               width="10"
               height="16"
@@ -248,7 +341,13 @@ export default function Details() {
           >
             {dayjs(selectedDay).format("MMMM DD YYYY")}
           </span>
-          <button className="p-2">
+          <button
+            className="p-2"
+            onClick={() => {
+              const dateSubtrack = dayjs(selectedDay).add(1, "day");
+              setSelectedDay(dayjs(dateSubtrack).format());
+            }}
+          >
             <svg
               width="11"
               height="16"
@@ -279,6 +378,12 @@ export default function Details() {
               <div
                 key={index}
                 onClick={() => {
+                  if (reservations.length > 1) {
+                    setHoursToBooking([]);
+                    setReservations([]);
+                    return;
+                  }
+
                   if (hoursToBooking.includes(time)) {
                     setHoursToBooking((prevValue) =>
                       prevValue.filter(
@@ -287,12 +392,13 @@ export default function Details() {
                     );
                     return;
                   }
+
                   setHoursToBooking([...hoursToBooking, time]);
                 }}
               >
                 <CardBookingHours
                   variant="FREE"
-                  hoursToBooking={hoursToBooking}
+                  reservations={reservations}
                   startTime={time.startTime}
                   endTime={time.endTime}
                 />
@@ -346,7 +452,7 @@ export default function Details() {
 
             <span className="font-medium text-darkBlue text-sm">
               <span className="font-bold">
-                {hoursToBooking.length / 2}
+                {diffHours ? diffHours / 60 : "0"}
               </span>{" "}
               h
             </span>
@@ -445,7 +551,13 @@ export default function Details() {
           </p>
         </div>
 
-        <button className="h-[50px] text-sm rounded-md bg-white text-darkBlue font-bold">
+        <button
+          className="h-[50px] text-sm rounded-md bg-white text-darkBlue font-bold"
+          onClick={() => {
+            setSelectedDay(dayjs().format());
+            setShowModalBooking(true);
+          }}
+        >
           Make a booking
         </button>
       </div>
@@ -510,7 +622,7 @@ export default function Details() {
             {packages.map((_, index: number) => (
               <div
                 key={index}
-                className={`border rounded-md border-darkBlue/90 ${
+                className={`border border-b-4 rounded-md border-darkBlue/50 ${
                   index === 0 ? "ml-5" : ""
                 } ${packages.length - 1 === index ? "mr-5" : ""}`}
               >

@@ -5,11 +5,12 @@ import { useHeight } from "../../hooks/useHeight";
 
 export default function Register() {
   const stylesHeight = useHeight();
+  const heightOfWindow = +stylesHeight.height.split("rem")[0] * 16;
 
   return (
     <form
       className="p-5 flex flex-col justify-between"
-      style={stylesHeight}
+      style={heightOfWindow < 720 ? { height: "100%" } : stylesHeight}
     >
       <div className="flex flex-col gap-y-5">
         <div>
@@ -69,7 +70,7 @@ export default function Register() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-y-4">
+      <div className="flex flex-col gap-y-4 mt-4">
         <button className="h-[50px] rounded-md bg-darkBlue text-white font-medium text-lg">
           Register
         </button>

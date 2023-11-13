@@ -2,17 +2,17 @@ interface CardProps {
   variant: "PARTIALLY" | "FREE" | "EXPIRED";
   startTime: string;
   // eslint-disable-next-line
-  hoursToBooking: any;
+  reservations: any;
   endTime: string;
 }
 
 export default function Card({
   variant,
   startTime,
-  hoursToBooking,
+  reservations,
   endTime,
 }: CardProps) {
-  const isSelected = hoursToBooking.find(
+  const isSelected = reservations.find(
     // eslint-disable-next-line
     (item: any) => (item.startTime === startTime ? true : false)
   );
