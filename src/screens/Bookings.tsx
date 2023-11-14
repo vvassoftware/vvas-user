@@ -1,11 +1,14 @@
 import Layout from "../components/Layout";
 import Card from "../components/Bookings/Card";
 import Exclamation from "../components/Illustrations/Exclamation";
+import { useNavigate } from "react-router-dom";
 
 const bookings = [{}, {}, {}];
 // const bookings = [];
 
 export default function Bookings() {
+  const navigate = useNavigate();
+
   return (
     <Layout>
       <header className="p-5">
@@ -27,7 +30,14 @@ export default function Bookings() {
             </div>
           </div>
         ) : (
-          bookings.map((_, index: number) => <Card key={index} />)
+          bookings.map((_, index: number) => (
+            <button
+              key={index}
+              onClick={() => navigate("/booking/reservation/1")}
+            >
+              <Card />
+            </button>
+          ))
         )}
       </div>
     </Layout>

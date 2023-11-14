@@ -707,7 +707,7 @@ export default function Details() {
       </Modal>
 
       <header className="p-5">
-        <BackButton title="Florida Ski School" />
+        <BackButton title="Water Sport School" />
       </header>
 
       <div className="p-[10px] items-center grid grid-cols-[1fr,120px] gap-x-2 z-[100] fixed bottom-0 left-0 bg-darkBlue w-full h-[100px]">
@@ -741,7 +741,7 @@ export default function Details() {
           Orlando, Florida
         </p>
         <p className="text-neutral-700 mt-2">
-          At FLORIDA SKI SCHOOL you pay hourly for the boat with all
+          At WATER SPORT SCHOOL you pay hourly for the boat with all
           you need included. One on one coaching for surf, ski,
           wakeboard and foil. You can bring up to 13 people and ski,
           surf, foil, wakeboard, tube, go for a sunset cocktail cruise

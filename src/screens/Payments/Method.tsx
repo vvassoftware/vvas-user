@@ -48,7 +48,7 @@ export default function Method() {
           </div>
           <div className="flex flex-col items-start gap-x-2">
             <p className="text-darkBlue font-bold">1 hour package</p>
-            <p className="text-neutral-700">Florida Ski School</p>
+            <p className="text-neutral-700">Water Sport School</p>
           </div>
         </div>
       </div>

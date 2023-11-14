@@ -1,14 +1,34 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm, SubmitHandler } from "react-hook-form";
+
 import { useHeight } from "../../hooks/useHeight";
 import Input from "../../ui/Input";
 
+type InputsLogin = {
+  email: string;
+  password: string;
+};
+
 export default function Login() {
+  const navigate = useNavigate();
   const stylesHeight = useHeight();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<InputsLogin>();
+
+  const handleLogin: SubmitHandler<InputsLogin> = async (data) => {
+    console.log(data);
+    navigate("/");
+  };
 
   return (
     <form
       className="p-5 flex flex-col justify-between"
       style={stylesHeight}
+      onSubmit={handleSubmit(handleLogin)}
     >
       <div className="flex flex-col gap-y-5">
         <div>
@@ -60,8 +80,10 @@ export default function Login() {
         </div>
 
         <div className="flex flex-col gap-y-3">
-          <Input placeholder="Email" />
-          <Input placeholder="Password" />
+          <Input placeholder="Email" {...register("email")} />
+          {errors.email && <span>This field is required</span>}
+          <Input placeholder="Password" {...register("password")} />
+          {errors.password && <span>This field is required</span>}
         </div>
       </div>
 

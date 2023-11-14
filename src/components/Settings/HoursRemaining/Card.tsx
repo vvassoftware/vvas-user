@@ -14,7 +14,7 @@ export default function Card() {
       <div className="border-r rounded-tr-md rounded-br-md border-t border-b border-[#9EB3C2] h-full flex w-full flex-col justify-between p-[7px_10px]">
         <div>
           <h3 className="font-bold text-darkBlue uppercase text-sm">
-            Florida Ski School
+            Water Sport School
           </h3>
           <p className="text-darkBlue text-xs">Orlando, Florida</p>
         </div>

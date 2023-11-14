@@ -14,6 +14,7 @@ import Register from "../screens/Auth/Register";
 import Details from "../screens/Booking/Details";
 import Method from "../screens/Payments/Method";
 import Tickets from "../screens/Payments/Tickets";
+import Reservation from "../screens/Booking/Reservation";
 
 export default function RoutesApp() {
   return (
@@ -22,6 +23,10 @@ export default function RoutesApp() {
         <Route path="/" element={<Home />} />
         <Route path="/bookings" element={<Bookings />} />
         <Route path="/profile" element={<Profile />} />
+        <Route
+          path="/booking/reservation/:id"
+          element={<Reservation />}
+        />
 
         {/* Settings */}
         <Route path="/past-bookings" element={<PastBookings />} />

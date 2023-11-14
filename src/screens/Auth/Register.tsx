@@ -1,16 +1,41 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm, SubmitHandler } from "react-hook-form";
 
 import Input from "../../ui/Input";
 import { useHeight } from "../../hooks/useHeight";
 
+type InputRegister = {
+  name: string;
+  lastname: string;
+  email: string;
+  password: string;
+  repeatPassword: string;
+};
+
 export default function Register() {
+  const navigate = useNavigate();
+
   const stylesHeight = useHeight();
   const heightOfWindow = +stylesHeight.height.split("rem")[0] * 16;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<InputRegister>();
+
+  const handleRegister: SubmitHandler<InputRegister> = async (
+    data
+  ) => {
+    console.log(data);
+    navigate("/");
+  };
 
   return (
     <form
       className="p-5 flex flex-col justify-between"
       style={heightOfWindow < 720 ? { height: "100%" } : stylesHeight}
+      onSubmit={handleSubmit(handleRegister)}
     >
       <div className="flex flex-col gap-y-5">
         <div>
@@ -62,11 +87,25 @@ export default function Register() {
         </div>
 
         <div className="flex flex-col gap-y-3">
-          <Input placeholder="Name" />
-          <Input placeholder="Lastname" />
-          <Input placeholder="Email" />
-          <Input placeholder="Password" />
-          <Input placeholder="Repeat your password" />
+          <Input placeholder="Name" {...register("name")} />
+          {errors.name && <span>This field is required</span>}
+
+          <Input placeholder="Lastname" {...register("lastname")} />
+          {errors.lastname && <span>This field is required</span>}
+
+          <Input placeholder="Email" {...register("email")} />
+          {errors.email && <span>This field is required</span>}
+
+          <Input placeholder="Password" {...register("password")} />
+          {errors.password && <span>This field is required</span>}
+
+          <Input
+            placeholder="Repeat your password"
+            {...register("repeatPassword")}
+          />
+          {errors.repeatPassword && (
+            <span>This field is required</span>
+          )}
         </div>
       </div>
 
