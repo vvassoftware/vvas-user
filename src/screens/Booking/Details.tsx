@@ -1,4 +1,8 @@
 import { useEffect, useState } from "react";
+import dayjs from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { HiOutlineStar, HiStar } from "react-icons/hi2";
 
 import BackButton from "../../components/BackButton";
 import ActivitiesCard from "../../components/Home/Activities/Card";
@@ -8,10 +12,11 @@ import Calendar from "../../components/Calendar";
 import CardBookingHours from "../../components/Details/Booking/Card";
 import Modal from "../../ui/Modal";
 import { useHeight } from "../../hooks/useHeight";
-import { HiOutlineStar, HiStar } from "react-icons/hi2";
 
 import { TIME_SCHOOL } from "../../../data/time";
-import dayjs from "dayjs";
+
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 const activities = [
   {
@@ -157,87 +162,80 @@ export default function Details() {
   const [reservations, setReservations] = useState<any>([]);
 
   const handleReservation = (startTime, endTime) => {
-    // Lógica para agregar las reservas que comienzan antes de endTime
-    const newReservations = TIME_SCHOOL.filter(
-      (time) =>
-        time.startTime >= startTime && time.startTime <= endTime
+    const selectedDayTime = dayjs(selectedDay).format("YYYY-MM-DD");
+
+    const startDateTime = dayjs(`${selectedDayTime} ${startTime}`, {
+      locale: "es",
+    });
+    const endDateTime = dayjs(`${selectedDayTime} ${endTime}`, {
+      locale: "es",
+    });
+
+    const differenceInMinutes = endDateTime.diff(
+      startDateTime,
+      "minute"
     );
 
-    setReservations((prevReservations) => [
-      ...prevReservations,
-      ...newReservations,
-    ]);
+    if (differenceInMinutes >= 0) {
+      const newReservations = TIME_SCHOOL.filter((time) => {
+        const timeStart = dayjs(
+          `${selectedDayTime} ${time.startTime}`,
+          {
+            locale: "es",
+          }
+        );
+        const timeEnd = dayjs(`${selectedDayTime} ${time.endTime}`, {
+          locale: "es",
+        });
+
+        const selectedDayTimeStart = dayjs(
+          `${selectedDayTime} ${startTime}`
+        );
+        const selectedDayTimeEnd = dayjs(
+          `${selectedDayTime} ${endTime}`
+        );
+
+        return (
+          (timeStart.isSameOrAfter(selectedDayTimeStart) ||
+            timeStart.isSame(selectedDayTimeEnd)) &&
+          timeEnd.isSameOrBefore(selectedDayTimeEnd)
+        );
+      });
+
+      // eslint-disable-next-line
+      setReservations((prevReservations: any) => [
+        ...prevReservations,
+        ...newReservations,
+      ]);
+    } else {
+      console.log("Rango de tiempo no valido");
+    }
   };
 
   useEffect(() => {
-    if (hoursToBooking.length === 0) {
+    if (hoursToBooking.length > 2) {
       setReservations([]);
+      setHoursToBooking([]);
       return;
     }
-    if (hoursToBooking.length < 1) return;
+
+    if (hoursToBooking.length === 1) {
+      handleReservation(
+        hoursToBooking[0].startTime,
+        hoursToBooking[0].endTime
+      );
+    }
 
     if (hoursToBooking.length > 1) {
       handleReservation(
         hoursToBooking[1].startTime,
-        hoursToBooking[0].startTime
-      );
-    } else {
-      handleReservation(
-        hoursToBooking[0].startTime,
-        hoursToBooking[0].startTime
+        hoursToBooking[0].endTime
       );
     }
+    // eslint-disable-next-line
   }, [hoursToBooking]);
 
   const bookingSchedule = getSchedule(hoursToBooking);
-
-  const { startTime: lowerValue, endTime: upValue } =
-    hoursToBooking.reduce((acc, curr) => {
-      acc.startTime =
-        !acc.startTime || curr.startTime < acc.startTime
-          ? curr.startTime
-          : acc.startTime;
-
-      acc.endTime =
-        !acc.endTime || curr.endTime > acc.endTime
-          ? curr.endTime
-          : acc.endTime;
-
-      return acc;
-    }, {});
-
-  const initialTime = lowerValue;
-  //  eslint-disable-next-line
-  let endTime: any;
-
-  if (reservations?.length > 1) {
-    endTime = upValue;
-  }
-
-  // eslint-disable-next-line
-  let initialDateTime: any;
-
-  // eslint-disable-next-line
-  let endDateTime: any;
-
-  if (reservations?.length > 0) {
-    // eslint-disable-next-line
-    initialDateTime = dayjs(
-      `${dayjs().format("YYYY-MM-DD")} ${initialTime}`
-    );
-
-    if (reservations?.length > 1) {
-      // eslint-disable-next-line
-      endDateTime = dayjs(
-        `${dayjs().format("YYYY-MM-DD")} ${endTime}`
-      );
-    }
-  }
-
-  const diffHours =
-    endDateTime &&
-    initialDateTime &&
-    endDateTime.diff(initialDateTime, "minute");
 
   return (
     <div className="mb-[128px]">
@@ -378,7 +376,7 @@ export default function Details() {
               <div
                 key={index}
                 onClick={() => {
-                  if (reservations.length > 1) {
+                  if (reservations.length > 2) {
                     setHoursToBooking([]);
                     setReservations([]);
                     return;
@@ -452,14 +450,23 @@ export default function Details() {
 
             <span className="font-medium text-darkBlue text-sm">
               <span className="font-bold">
-                {diffHours ? diffHours / 60 : "0"}
+                {hoursToBooking.length === 1
+                  ? "0.5"
+                  : reservations?.length - 1 / 2 > 0
+                  ? (reservations?.length - 1) / 2
+                  : "0"}
               </span>{" "}
               h
             </span>
           </div>
         </div>
 
-        <button className="font-medium mt-4 h-[50px] bg-darkBlue text-white rounded-md grid place-items-center w-full">
+        <button
+          disabled={hoursToBooking?.length <= 1}
+          className={`${
+            hoursToBooking?.length <= 1 ? "opacity-60" : "opacity-100"
+          } font-medium mt-4 h-[50px] bg-darkBlue text-white rounded-md grid place-items-center w-full`}
+        >
           Select
         </button>
       </Modal>
