@@ -29,6 +29,7 @@ export default function Register() {
   ) => {
     console.log(data);
     navigate("/");
+    localStorage.setItem("access_token", "some token");
   };
 
   return (

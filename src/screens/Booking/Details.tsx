@@ -741,11 +741,18 @@ export default function Details() {
           Orlando, Florida
         </p>
         <p className="text-neutral-700 mt-2">
-          At WATER SPORT SCHOOL you pay hourly for the boat with all
-          you need included. One on one coaching for surf, ski,
-          wakeboard and foil. You can bring up to 13 people and ski,
-          surf, foil, wakeboard, tube, go for a sunset cocktail cruise
-          or just hang out with your friends and family!
+          Experience the thrill of Miami's aquatic wonders at MIAMI
+          AQUA ADVENTURES. Our personalized water sports school offers
+          one-on-one coaching in surfing, water skiing, wakeboarding,
+          and foil boarding. With the flexibility to bring up to 13
+          people, you can enjoy activities ranging from exhilarating
+          wave rides to serene sunset cruises. Our expert instructors
+          and inclusive packages ensure a unique and tailored
+          experience for each participant. Dive into the excitement,
+          whether defying gravity on a foil or cruising with friends
+          and family. MIAMI AQUA ADVENTURES is your gateway to
+          unforgettable water adventures, where every moment is
+          crafted for ultimate enjoyment on the ocean.
         </p>
       </div>
 

@@ -22,6 +22,7 @@ export default function Login() {
   const handleLogin: SubmitHandler<InputsLogin> = async (data) => {
     console.log(data);
     navigate("/");
+    localStorage.setItem("access_token", "some token");
   };
 
   return (

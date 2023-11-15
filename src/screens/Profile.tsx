@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
 
@@ -6,11 +6,15 @@ import Button from "../components/Footer/Button";
 import Layout from "../components/Layout";
 
 export default function Profile() {
-  const isLogged = false;
+  const [isLogged, setIsLogged] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const [showModalLogout, setShowModalLogout] =
     useState<boolean>(false);
+
+  useEffect(() => {
+    setIsLogged(localStorage.getItem("access_token") ? true : false);
+  }, []);
 
   return (
     <Layout>
@@ -41,7 +45,10 @@ export default function Profile() {
               </button>
               <button
                 className="font-medium text-white w-full bg-darkBlue h-[50px] rounded-md"
-                onClick={() => navigate("/login")}
+                onClick={() => {
+                  navigate("/login");
+                  localStorage.removeItem("access_token");
+                }}
               >
                 Yes, leave
               </button>
