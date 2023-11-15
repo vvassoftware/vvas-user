@@ -952,7 +952,7 @@ export default function Details() {
             <div className="w-12 h-12 bg-lightBlue rounded-full"></div>
             <div>
               <h4 className="text-sm font-bold text-darkBlue">
-                Franck Desbouyaux
+                Edmund Preston
               </h4>
               <p className="text-sm text-darkBlue">Florida, Miami</p>
             </div>
