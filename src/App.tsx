@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import WindowSizeProvider from "./context/WindowSize";
 import RoutesApp from "./router/Routes";
 
+import { Toaster } from "react-hot-toast";
+
 export default function App() {
   useEffect(() => {
     const access_token = localStorage.getItem("access_token");
@@ -14,6 +16,7 @@ export default function App() {
 
   return (
     <WindowSizeProvider>
+      <Toaster position="top-center" reverseOrder={false} />
       <RoutesApp />
     </WindowSizeProvider>
   );

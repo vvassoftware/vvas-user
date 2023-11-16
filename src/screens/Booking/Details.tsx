@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { HiOutlineStar, HiStar } from "react-icons/hi2";
+import { toast } from "react-hot-toast";
 
 import BackButton from "../../components/BackButton";
 import ActivitiesCard from "../../components/Home/Activities/Card";
@@ -378,7 +379,7 @@ export default function Details() {
                 }}
               >
                 <CardBookingHours
-                  variant="FREE"
+                  variant="AVAILABLE"
                   reservations={reservations}
                   startTime={time.startTime}
                   endTime={time.endTime}
@@ -649,7 +650,8 @@ export default function Details() {
           onClick={() => {
             setShowModalBooking(false);
             setShowModalBoat(true);
-            navigate("/payments");
+            toast.success("Reservation created!");
+            navigate("/bookings");
           }}
         >
           Select
@@ -728,7 +730,7 @@ export default function Details() {
 
         <div className="mt-3">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d449614.5130699682!2d-81.77209088121924!3d28.310033468939324!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88e781e1488bfeb3%3A0x777f0ec9db140146!2sFlorida%20Ski%20School!5e0!3m2!1ses!2spy!4v1699462787427!5m2!1ses!2spy"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7006.719071067462!2d-81.3455164!3d28.588989!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88e77004001920d3%3A0xb8d10c765ef46993!2sLake%20Virginia!5e0!3m2!1ses!2spy!4v1700156836417!5m2!1ses!2spy"
             width="100%"
             height="260"
             style={{ border: 0 }}
