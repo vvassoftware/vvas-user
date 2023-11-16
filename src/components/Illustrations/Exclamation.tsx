@@ -7,7 +7,7 @@ export default function Exclamation() {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_3700_25112)">
+      <g clipPath="url(#clip0_3700_25112)">
         <path
           d="M211.014 149.556L204.406 129.616C204.406 129.616 211.674 136.884 211.674 142.847L210.37 129.057C210.37 129.057 214.097 134.088 213.724 141.729C213.351 149.37 211.014 149.556 211.014 149.556Z"
           fill="#E6E6E6"

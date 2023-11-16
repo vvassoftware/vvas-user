@@ -16,60 +16,10 @@ import { useHeight } from "../../hooks/useHeight";
 import { TIME_SCHOOL } from "../../../data/time";
 import CardBoat from "../../components/Details/Boat/Card";
 import { useNavigate } from "react-router-dom";
+import { ACTIVITIES } from "../../../data/activities";
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
-
-const activities = [
-  {
-    id: 1,
-    name: "WaterSport Rental",
-    location: "Tampa, Florida",
-    stars: 4,
-    price: 150,
-    image: "https://example.com/water-sport-image1.jpg",
-  },
-  {
-    id: 2,
-    name: "Aquatic Adventures",
-    location: "Miami, Florida",
-    stars: 5,
-    price: 200,
-    image: "https://example.com/water-sport-image2.jpg",
-  },
-  {
-    id: 3,
-    name: "WaveRiders Academy",
-    location: "San Diego, California",
-    stars: 4,
-    price: 180,
-    image: "https://example.com/water-sport-image3.jpg",
-  },
-  {
-    id: 4,
-    name: "Ocean Explorers",
-    location: "Hawaii",
-    stars: 5,
-    price: 250,
-    image: "https://example.com/water-sport-image4.jpg",
-  },
-  {
-    id: 5,
-    name: "Surf 'n Sail",
-    location: "Los Angeles, California",
-    stars: 3,
-    price: 120,
-    image: "https://example.com/water-sport-image5.jpg",
-  },
-  {
-    id: 6,
-    name: "BlueWave Watersports",
-    location: "Key West, Florida",
-    stars: 4,
-    price: 175,
-    image: "https://example.com/water-sport-image6.jpg",
-  },
-];
 
 const packages = ["", "", "", ""];
 
@@ -758,14 +708,14 @@ export default function Details() {
 
       <div className="hide-scrollbar overflow-x-auto mt-5">
         <div className="flex w-max gap-x-4">
-          {activities.map((_, index: number) => (
+          {ACTIVITIES.map((activity, index: number) => (
             <div
               key={index}
               className={`${index === 0 ? "pl-5" : ""} ${
-                activities.length - 1 === index ? "pr-5" : ""
+                ACTIVITIES.length - 1 === index ? "pr-5" : ""
               }`}
             >
-              <ActivitiesCard />
+              <ActivitiesCard activity={activity} />
             </div>
           ))}
         </div>
