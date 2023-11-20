@@ -1,18 +1,25 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 import Input from "../../ui/Input";
 import { useHeight } from "../../hooks/useHeight";
+import { createUser } from "../../actions/user";
+import toast from "react-hot-toast";
 
-type InputRegister = {
-  name: string;
-  lastname: string;
+export type InputRegister = {
+  name?: string;
+  lastname?: string;
   email: string;
   password: string;
-  repeatPassword: string;
+  repeatPassword?: string;
+  type?: string;
 };
 
-export default function Register() {
+export default function Register({
+  setView,
+}: {
+  setView: (value: string) => void;
+}) {
   const navigate = useNavigate();
 
   const stylesHeight = useHeight();
@@ -22,15 +29,34 @@ export default function Register() {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<InputRegister>();
 
   const handleRegister: SubmitHandler<InputRegister> = async (
     data
   ) => {
-    console.log(data);
-    navigate("/");
-    localStorage.setItem("access_token", "some token");
+    const { name, email, lastname, password } = data;
+
+    try {
+      const user = await createUser({
+        name,
+        lastname,
+        email,
+        password,
+        type: "user",
+      });
+      toast.success("Account created successfully");
+      navigate("/");
+      localStorage.setItem("access_token", user?.access_token);
+      // eslint-disable-next-line
+    } catch (error: any) {
+      toast.error(error.response.data.message as string);
+      console.log(error, "FRONTEND_CREATE_USER");
+      return null;
+    }
   };
+
+  const password = watch("password", "");
 
   return (
     <form
@@ -88,24 +114,68 @@ export default function Register() {
         </div>
 
         <div className="flex flex-col gap-y-3">
-          <Input placeholder="Name" {...register("name")} />
-          {errors.name && <span>This field is required</span>}
-
-          <Input placeholder="Lastname" {...register("lastname")} />
-          {errors.lastname && <span>This field is required</span>}
-
-          <Input placeholder="Email" {...register("email")} />
-          {errors.email && <span>This field is required</span>}
-
-          <Input placeholder="Password" {...register("password")} />
-          {errors.password && <span>This field is required</span>}
+          <Input
+            id="name"
+            placeholder="Name"
+            register={register}
+            required
+          />
+          {errors.name && (
+            <span className="-mt-2 text-sm text-red-600">
+              This field is required
+            </span>
+          )}
 
           <Input
+            id="lastname"
+            placeholder="Lastname"
+            register={register}
+            required
+          />
+          {errors.lastname && (
+            <span className="-mt-2 text-sm text-red-600">
+              This field is required
+            </span>
+          )}
+
+          <Input
+            id="email"
+            placeholder="Email"
+            register={register}
+            required
+          />
+          {errors.email && (
+            <span className="-mt-2 text-sm text-red-600">
+              This field is required
+            </span>
+          )}
+
+          <Input
+            id="password"
+            type="password"
+            placeholder="Password"
+            required
+            register={register}
+          />
+          {errors.password && (
+            <span className="-mt-2 text-sm text-red-600">
+              This field is required
+            </span>
+          )}
+
+          <Input
+            type="password"
+            id="repeatPassword"
             placeholder="Repeat your password"
-            {...register("repeatPassword")}
+            required
+            register={register}
+            password={password}
           />
           {errors.repeatPassword && (
-            <span>This field is required</span>
+            <span className="-mt-2 text-sm text-red-600">
+              {errors.repeatPassword.message}
+              {/* This field is required */}
+            </span>
           )}
         </div>
       </div>
@@ -117,9 +187,12 @@ export default function Register() {
 
         <span className="text-center">
           If you already have an account,{" "}
-          <Link to="/login" className="text-darkBlue underline">
+          <span
+            onClick={() => setView("login")}
+            className="text-darkBlue underline"
+          >
             login
-          </Link>
+          </span>
         </span>
       </div>
     </form>

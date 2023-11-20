@@ -1,17 +1,24 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
+import toast from "react-hot-toast";
 
 import { useHeight } from "../../hooks/useHeight";
 import Input from "../../ui/Input";
+import { loginUser } from "../../actions/user";
 
 type InputsLogin = {
   email: string;
   password: string;
 };
 
-export default function Login() {
+export default function Login({
+  setView,
+}: {
+  setView: (value: string) => void;
+}) {
   const navigate = useNavigate();
   const stylesHeight = useHeight();
+  const heightOfWindow = +stylesHeight.height.split("rem")[0] * 16;
 
   const {
     register,
@@ -20,15 +27,28 @@ export default function Login() {
   } = useForm<InputsLogin>();
 
   const handleLogin: SubmitHandler<InputsLogin> = async (data) => {
-    console.log(data);
-    navigate("/");
-    localStorage.setItem("access_token", "some token");
+    const { email, password } = data;
+
+    try {
+      const user = await loginUser({
+        email,
+        password,
+      });
+      toast.success("You are logged in");
+      navigate("/");
+      localStorage.setItem("access_token", user?.access_token);
+      // eslint-disable-next-line
+    } catch (error: any) {
+      toast.error(error.response.data.message as string);
+      console.log(error, "FRONTEND_CREATE_USER");
+      return null;
+    }
   };
 
   return (
     <form
       className="p-5 flex flex-col justify-between"
-      style={stylesHeight}
+      style={heightOfWindow < 720 ? { height: "100%" } : stylesHeight}
       onSubmit={handleSubmit(handleLogin)}
     >
       <div className="flex flex-col gap-y-5">
@@ -81,9 +101,20 @@ export default function Login() {
         </div>
 
         <div className="flex flex-col gap-y-3">
-          <Input placeholder="Email" {...register("email")} />
+          <Input
+            placeholder="Email"
+            register={register}
+            id="email"
+            required
+          />
           {errors.email && <span>This field is required</span>}
-          <Input placeholder="Password" {...register("password")} />
+          <Input
+            placeholder="Password"
+            register={register}
+            type="password"
+            id="password"
+            required
+          />
           {errors.password && <span>This field is required</span>}
         </div>
       </div>
@@ -95,9 +126,12 @@ export default function Login() {
 
         <span className="text-center">
           If you don't have an account,{" "}
-          <Link to="/register" className="text-darkBlue underline">
+          <span
+            onClick={() => setView("register")}
+            className="text-darkBlue underline"
+          >
             register
-          </Link>
+          </span>
         </span>
       </div>
     </form>

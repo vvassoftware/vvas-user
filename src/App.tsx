@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 
-import WindowSizeProvider from "./context/WindowSize";
-import RoutesApp from "./router/Routes";
-
 import { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function App() {
+  const navigate = useNavigate();
+
   useEffect(() => {
     const access_token = localStorage.getItem("access_token");
 
@@ -14,10 +14,13 @@ export default function App() {
     }
   }, []);
 
-  return (
-    <WindowSizeProvider>
-      <Toaster position="top-center" reverseOrder={false} />
-      <RoutesApp />
-    </WindowSizeProvider>
-  );
+  useEffect(() => {
+    const accessToken = localStorage.getItem("access_token");
+
+    if (!accessToken) {
+      navigate("/auth");
+    }
+  }, [navigate]);
+
+  return <Toaster position="top-center" reverseOrder={false} />;
 }

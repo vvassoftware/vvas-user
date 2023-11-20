@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FieldValues, useForm } from "react-hook-form";
+
 import BackButton from "../../components/BackButton";
 import Input from "../../ui/Input";
-import { useNavigate } from "react-router-dom";
 
 enum ENUM_METHOD {
   VENMO = "VENMO",
@@ -9,12 +11,21 @@ enum ENUM_METHOD {
   PAYPAL = "PAYPAL",
 }
 
+export type InputMethodPayments = {
+  name: string;
+  lastname: string;
+  expiration: string;
+  cvv: string;
+};
+
 export default function Method() {
   const navigate = useNavigate();
 
   const [methodSelected, setMethodSelected] = useState<ENUM_METHOD>(
     ENUM_METHOD.VENMO
   );
+
+  const { register } = useForm<FieldValues>();
 
   return (
     <div>
@@ -99,12 +110,20 @@ export default function Method() {
           </h2>
 
           <div className="mt-3 flex flex-col gap-y-3">
-            <Input placeholder="Name" />
-            <Input placeholder="Lastname" />
+            <Input register={register} id="name" placeholder="Name" />
+            <Input
+              register={register}
+              id="lastname"
+              placeholder="Lastname"
+            />
 
             <div className="grid grid-cols-2 gap-x-3">
-              <Input placeholder="Expiration date" />
-              <Input placeholder="CVV" />
+              <Input
+                register={register}
+                id="expiration"
+                placeholder="Expiration date"
+              />
+              <Input register={register} id="cvv" placeholder="CVV" />
             </div>
 
             <button

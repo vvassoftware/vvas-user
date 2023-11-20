@@ -8,15 +8,17 @@ import PastBookings from "../screens/Settings/PastBookings";
 import PaymentsMethods from "../screens/Settings/PaymentsMethods";
 import HoursRemaining from "../screens/Settings/HoursRemaining";
 
-import Login from "../screens/Auth/Login";
-import Register from "../screens/Auth/Register";
-
 import Details from "../screens/Booking/Details";
 import Method from "../screens/Payments/Method";
 import Tickets from "../screens/Payments/Tickets";
 import Reservation from "../screens/Booking/Reservation";
+import Auth from "../screens/Auth";
 
-export default function RoutesApp() {
+export default function RoutesApp({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <BrowserRouter>
       <Routes>
@@ -37,14 +39,14 @@ export default function RoutesApp() {
         <Route path="/hours-remaining" element={<HoursRemaining />} />
 
         {/* Auth */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/auth" element={<Auth />} />
 
         {/* Main */}
         <Route path="/booking/:id" element={<Details />} />
         <Route path="/payments" element={<Method />} />
         <Route path="/payments/ticket" element={<Tickets />} />
       </Routes>
+      <div>{children}</div>
     </BrowserRouter>
   );
 }
