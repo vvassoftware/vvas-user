@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
 
 import Button from "../components/Footer/Button";
 import Layout from "../components/Layout";
+import { UserAuthContext } from "../context/UserAuth";
 
 export default function Profile() {
   const [isLogged, setIsLogged] = useState<boolean>(false);
+  const { user, setUser } = useContext(UserAuthContext);
 
   const navigate = useNavigate();
   const [showModalLogout, setShowModalLogout] =
@@ -46,8 +48,9 @@ export default function Profile() {
               <button
                 className="font-medium text-white w-full bg-darkBlue h-[50px] rounded-md"
                 onClick={() => {
-                  navigate("/login");
+                  navigate("/auth");
                   localStorage.removeItem("access_token");
+                  setUser(null);
                 }}
               >
                 Yes, leave
@@ -102,9 +105,9 @@ export default function Profile() {
 
           <div className="px-5">
             <h3 className="text-xl text-darkBlue font-bold">
-              Steve Ballmer
+              {user?.name} {user?.lastname}
             </h3>
-            <p className="text-[#333]">steveballmer@outlook.com</p>
+            <p className="text-[#333]">{user?.email}</p>
           </div>
 
           <div className="px-5 mt-5">

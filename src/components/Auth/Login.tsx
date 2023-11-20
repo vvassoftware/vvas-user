@@ -1,10 +1,13 @@
+import { useContext } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
-import toast from "react-hot-toast";
 
 import { useHeight } from "../../hooks/useHeight";
 import Input from "../../ui/Input";
 import { loginUser } from "../../actions/user";
+import { login } from "../../helpers/user";
+import { UserAuthContext } from "../../context/UserAuth";
 
 type InputsLogin = {
   email: string;
@@ -16,6 +19,8 @@ export default function Login({
 }: {
   setView: (value: string) => void;
 }) {
+  const { setUser } = useContext(UserAuthContext);
+
   const navigate = useNavigate();
   const stylesHeight = useHeight();
   const heightOfWindow = +stylesHeight.height.split("rem")[0] * 16;
@@ -34,9 +39,9 @@ export default function Login({
         email,
         password,
       });
+      await login(user?.access_token, setUser);
       toast.success("You are logged in");
       navigate("/");
-      localStorage.setItem("access_token", user?.access_token);
       // eslint-disable-next-line
     } catch (error: any) {
       toast.error(error.response.data.message as string);

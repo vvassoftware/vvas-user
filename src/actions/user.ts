@@ -20,3 +20,12 @@ export const loginUser = async (data: InputRegister) => {
 
   return response.data;
 };
+
+export const getUserInfo = async (id: string) => {
+  const response = await axios({
+    method: "GET",
+    url: `/api/user/${id}`,
+  });
+
+  return response.data;
+};

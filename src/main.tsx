@@ -5,13 +5,16 @@ import App from "./App.tsx";
 import "./index.css";
 import RoutesApp from "./router/Routes.tsx";
 import WindowSizeProvider from "./context/WindowSize.tsx";
+import UserAuthProvider from "./context/UserAuth.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <WindowSizeProvider>
-      <RoutesApp>
-        <App />
-      </RoutesApp>
+      <UserAuthProvider>
+        <RoutesApp>
+          <App />
+        </RoutesApp>
+      </UserAuthProvider>
     </WindowSizeProvider>
   </React.StrictMode>
 );

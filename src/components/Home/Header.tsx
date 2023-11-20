@@ -1,4 +1,9 @@
+import { useContext } from "react";
+import { UserAuthContext } from "../../context/UserAuth";
+
 export default function Header() {
+  const { user } = useContext(UserAuthContext);
+
   return (
     <div className="p-5 bg-darkBlue">
       <div className="flex items-center justify-between ">
@@ -23,7 +28,7 @@ export default function Header() {
 
       <div className="mt-4">
         <h2 className="text-white font-bold text-[22px]">
-          Good afternoon Steve!
+          Good afternoon {user?.name}!
         </h2>
         <p className="text-lg text-white">Welcome to VVAS</p>
       </div>
