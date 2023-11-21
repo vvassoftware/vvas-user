@@ -6,10 +6,11 @@ import OfferingCard from "../components/Home/Offerings/Card";
 import Layout from "../components/Layout";
 
 import { ACTIVITIES } from "../../data/activities";
-import { SCHOOLS } from "../../data/schools";
+import { useSchools } from "../actions/school";
 
 export default function Home() {
   const navigate = useNavigate();
+  const schools = useSchools();
 
   return (
     <Layout>
@@ -43,15 +44,21 @@ export default function Home() {
 
         <div className="hide-scrollbar overflow-x-auto mt-3">
           <div className="grid grid-cols-2 gap-y-4 gap-x-3">
-            {SCHOOLS.map((school, index: number) => (
-              <div
-                key={index}
-                className="cursor-pointer"
-                onClick={() => navigate("/booking/1")}
-              >
-                <OfferingCard school={school} />
-              </div>
-            ))}
+            {schools.isLoading ? (
+              <div>loading...</div>
+            ) : schools.isError ? (
+              <div>something went wrong</div>
+            ) : (
+              schools.data.map((school, index: number) => (
+                <div
+                  key={index}
+                  className="cursor-pointer"
+                  onClick={() => navigate("/booking/1")}
+                >
+                  <OfferingCard school={school} />
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

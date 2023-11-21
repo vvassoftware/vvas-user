@@ -92,7 +92,9 @@ export default function Card({ school }: any) {
           </div>
           <div className="flex justify-end w-full items-center gap-x-1 text-white text-xs">
             <p>From</p>
-            <span className="font-bold text-sm">${school.price}</span>
+            <span className="font-bold text-sm">
+              ${school.startPrice}
+            </span>
           </div>
         </div>
       </div>
