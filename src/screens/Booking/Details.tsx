@@ -4,6 +4,12 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { HiOutlineStar, HiStar } from "react-icons/hi2";
 import { toast } from "react-hot-toast";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+} from "react-leaflet";
 
 import BackButton from "../../components/BackButton";
 import ActivitiesCard from "../../components/Home/Activities/Card";
@@ -16,18 +22,19 @@ import { useHeight } from "../../hooks/useHeight";
 
 import { TIME_SCHOOL } from "../../../data/time";
 import CardBoat from "../../components/Details/Boat/Card";
-import { useNavigate } from "react-router-dom";
-import { ACTIVITIES } from "../../../data/activities";
+import { useNavigate, useParams } from "react-router-dom";
+import { useSchool } from "../../actions/school";
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
-
-const packages = ["", "", "", ""];
 
 const boats: string[] = ["1", "2", "3"];
 
 export default function Details() {
   const navigate = useNavigate();
+  const { id } = useParams();
+
+  const school = useSchool(+id! as number);
 
   const currentDate = dayjs();
   const { height } = useHeight();
@@ -217,9 +224,10 @@ export default function Details() {
     // eslint-disable-next-line
   }, [hoursToBooking]);
 
-  console.log(hoursToBooking);
-
   const bookingSchedule = getSchedule(reservations);
+
+  if (school.isLoading) return <div>loading..</div>;
+  if (school.isError) return <div>something went wrong</div>;
 
   return (
     <div className="mb-[128px]">
@@ -659,7 +667,7 @@ export default function Details() {
       </Modal>
 
       <header className="p-5">
-        <BackButton title="Water Sport School" />
+        <BackButton title={school.data.name} />
       </header>
 
       <div className="p-[10px] items-center grid grid-cols-[1fr,120px] gap-x-2 z-[100] fixed bottom-0 left-0 bg-darkBlue w-full h-[100px]">
@@ -690,31 +698,22 @@ export default function Details() {
           className="w-full h-[200px] object-cover rounded-md"
         />
         <p className="font-medium text-darkBlue mt-3">
-          Orlando, Florida
+          {school.data.locationName}
         </p>
         <p className="text-neutral-700 mt-2">
-          Experience the thrill of Miami's aquatic wonders at MIAMI
-          AQUA ADVENTURES. Our personalized water sports school offers
-          one-on-one coaching in surfing, water skiing, wakeboarding,
-          and foil boarding. With the flexibility to bring up to 13
-          people, you can enjoy activities ranging from exhilarating
-          wave rides to serene sunset cruises. Our expert instructors
-          and inclusive packages ensure a unique and tailored
-          experience for each participant. Dive into the excitement,
-          whether defying gravity on a foil or cruising with friends
-          and family. MIAMI AQUA ADVENTURES is your gateway to
-          unforgettable water adventures, where every moment is
-          crafted for ultimate enjoyment on the ocean.
+          {school.data.description}
         </p>
       </div>
 
       <div className="hide-scrollbar overflow-x-auto mt-5">
         <div className="flex w-max gap-x-4">
-          {ACTIVITIES.map((activity, index: number) => (
+          {school.data.activities.map((activity, index: number) => (
             <div
               key={index}
               className={`${index === 0 ? "pl-5" : ""} ${
-                ACTIVITIES.length - 1 === index ? "pr-5" : ""
+                school.data.activities.length - 1 === index
+                  ? "pr-5"
+                  : ""
               }`}
             >
               <ActivitiesCard activity={activity} />
@@ -728,15 +727,29 @@ export default function Details() {
           Location
         </h3>
 
-        <div className="mt-3">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7006.719071067462!2d-81.3455164!3d28.588989!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88e77004001920d3%3A0xb8d10c765ef46993!2sLake%20Virginia!5e0!3m2!1ses!2spy!4v1700156836417!5m2!1ses!2spy"
-            width="100%"
-            height="260"
-            style={{ border: 0 }}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
+        <div className="mt-3 overflow-hidden relative z-10">
+          <MapContainer
+            center={[
+              school.data.coords[0].latitude,
+              school.data.coords[0].longitude,
+            ]}
+            zoom={14}
+            scrollWheelZoom={false}
+            style={{ height: 300 }}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker
+              position={[
+                school.data.coords[0].latitude,
+                school.data.coords[0].longitude,
+              ]}
+            >
+              <Popup>{/* <FaMarker /> */}</Popup>
+            </Marker>
+          </MapContainer>
         </div>
       </div>
 
@@ -747,16 +760,27 @@ export default function Details() {
 
         <div className="hide-scrollbar overflow-x-auto mt-3">
           <div className="flex w-max gap-x-3">
-            {packages.map((_, index: number) => (
-              <div
-                key={index}
-                className={`border border-b-4 rounded-md border-darkBlue/50 ${
-                  index === 0 ? "ml-5" : ""
-                } ${packages.length - 1 === index ? "mr-5" : ""}`}
-              >
-                <PackagesCard />
-              </div>
-            ))}
+            {school.data.packages.map(
+              // eslint-disable-next-line
+              (packageData: any, index: number) => (
+                <div
+                  key={index}
+                  className={`border border-b-4 rounded-md border-darkBlue/50 ${
+                    index === 0 ? "ml-5" : ""
+                  } ${
+                    school.data.packages.length - 1 === index
+                      ? "mr-5"
+                      : ""
+                  }`}
+                >
+                  <PackagesCard
+                    key={index}
+                    price={packageData.price}
+                    hours={packageData.hours}
+                  />
+                </div>
+              )
+            )}
           </div>
         </div>
       </div>

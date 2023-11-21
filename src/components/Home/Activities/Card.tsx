@@ -10,7 +10,7 @@ export default function Card({ activity }: { activity: CardProps }) {
       <div className="w-full h-full absolute top-0 left-0 bg-black opacity-40" />
 
       <div className="absolute z-50 top-1/2 -translate-x-1/2 -translate-y-1/2 left-1/2">
-        <p className="text-white text-[22px] text-center font-bold uppercase">
+        <p className="text-white text-[22px] leading-6 text-center font-bold uppercase">
           {activity.name}
         </p>
       </div>
