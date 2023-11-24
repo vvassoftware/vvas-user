@@ -3,7 +3,10 @@ const image =
 
 export default function Card() {
   return (
-    <button className="rounded-md overflow-hidden h-[120px] w-full flex bg-darkBlue">
+    <div
+      role="button"
+      className="rounded-md overflow-hidden h-[120px] w-full flex bg-darkBlue"
+    >
       <div className="w-[150px] h-full">
         <img
           src={image}
@@ -28,6 +31,6 @@ export default function Card() {
           </div>
         </div>
       </div>
-    </button>
+    </div>
   );
 }

@@ -1,15 +1,20 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+
 import dayjs from "dayjs";
-import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
-import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { HiOutlineStar, HiStar } from "react-icons/hi2";
 import { toast } from "react-hot-toast";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-} from "react-leaflet";
+
+import { MapContainer } from "react-leaflet/MapContainer";
+import { TileLayer } from "react-leaflet/TileLayer";
+import { Marker } from "react-leaflet/Marker";
+import { Popup } from "react-leaflet/Popup";
+
+// import {
+//   MapContainer,
+//   TileLayer,
+//   Marker,
+//   Popup,
+// } from "react-leaflet";
 
 import BackButton from "../../components/BackButton";
 import ActivitiesCard from "../../components/Home/Activities/Card";
@@ -24,19 +29,31 @@ import { TIME_SCHOOL } from "../../../data/time";
 import CardBoat from "../../components/Details/Boat/Card";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSchool } from "../../actions/school";
-
-dayjs.extend(isSameOrAfter);
-dayjs.extend(isSameOrBefore);
-
-const boats: string[] = ["1", "2", "3"];
+import { DataReservationContext } from "../../context/DataReservation";
+import {
+  createBooking,
+  getAllBookingsBySchool,
+} from "../../actions/booking";
+import { canMakeReservation } from "../../helpers/canMakeReservation";
+import { useBoats } from "../../actions/boats";
+import { TimeZoneContext } from "../../context/TimezoneContext";
 
 export default function Details() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { dataToBooking, setDataToBooking } = useContext(
+    DataReservationContext
+  );
+
+  const { formatWithUserTimeZone } = useContext(TimeZoneContext);
+
+  const today = formatWithUserTimeZone(true, new Date());
 
   const school = useSchool(+id! as number);
+  const boats = useBoats();
 
-  const currentDate = dayjs();
+  const currentDate = formatWithUserTimeZone(true, new Date());
+
   const { height } = useHeight();
   const valueHeight = +height.split("rem")[0] * 16;
 
@@ -48,34 +65,36 @@ export default function Details() {
     useState<boolean>(false);
   const [showModalBoat, setShowModalBoat] = useState<boolean>(false);
 
-  const [boatSelected, setBoatSelected] = useState<string>("");
+  const [boatSelected, setBoatSelected] = useState<number>(0);
   const [valueStars, setValueStars] = useState<number>(0);
 
   // eslint-disable-next-line
   const [hoursToBooking, setHoursToBooking] = useState<any[]>([]);
 
   const [selectedDay, setSelectedDay] = useState<string>(
-    dayjs().format()
+    formatWithUserTimeZone(false, new Date(), "YYYY-MM-DD")
   );
 
-  const startOfWeek = currentDate.startOf("week");
-  const today = currentDate.format("YYYY-MM-DD");
+  const startOfWeek = formatWithUserTimeZone(
+    true,
+    new Date()
+  )?.startOf("week");
 
   const weekDates = [
-    startOfWeek.format("YYYY-MM-DD"),
-    startOfWeek.add(1, "day").format("YYYY-MM-DD"),
-    startOfWeek.add(2, "days").format("YYYY-MM-DD"),
-    startOfWeek.add(3, "days").format("YYYY-MM-DD"),
-    startOfWeek.add(4, "days").format("YYYY-MM-DD"),
-    startOfWeek.add(5, "days").format("YYYY-MM-DD"),
-    startOfWeek.add(6, "days").format("YYYY-MM-DD"),
-    startOfWeek.add(7, "days").format("YYYY-MM-DD"),
-    startOfWeek.add(8, "days").format("YYYY-MM-DD"),
-    startOfWeek.add(9, "days").format("YYYY-MM-DD"),
-    startOfWeek.add(10, "days").format("YYYY-MM-DD"),
-    startOfWeek.add(11, "days").format("YYYY-MM-DD"),
-    startOfWeek.add(12, "days").format("YYYY-MM-DD"),
-    startOfWeek.add(13, "days").format("YYYY-MM-DD"),
+    startOfWeek?.format("YYYY-MM-DD"),
+    startOfWeek?.add(1, "day").format("YYYY-MM-DD"),
+    startOfWeek?.add(2, "days").format("YYYY-MM-DD"),
+    startOfWeek?.add(3, "days").format("YYYY-MM-DD"),
+    startOfWeek?.add(4, "days").format("YYYY-MM-DD"),
+    startOfWeek?.add(5, "days").format("YYYY-MM-DD"),
+    startOfWeek?.add(6, "days").format("YYYY-MM-DD"),
+    startOfWeek?.add(7, "days").format("YYYY-MM-DD"),
+    startOfWeek?.add(8, "days").format("YYYY-MM-DD"),
+    startOfWeek?.add(9, "days").format("YYYY-MM-DD"),
+    startOfWeek?.add(10, "days").format("YYYY-MM-DD"),
+    startOfWeek?.add(11, "days").format("YYYY-MM-DD"),
+    startOfWeek?.add(12, "days").format("YYYY-MM-DD"),
+    startOfWeek?.add(13, "days").format("YYYY-MM-DD"),
   ];
 
   function getSchedule(bookings) {
@@ -124,68 +143,84 @@ export default function Details() {
     setValueStars(0);
   }, [showModalBooking, showModalReview]);
 
+  useEffect(() => {
+    setDataToBooking({
+      startTime: "",
+      endTime: "",
+      selectedDay: "",
+      boatId: 0,
+      schoolId: 0,
+    });
+  }, [setDataToBooking]);
+
   // eslint-disable-next-line
   const [reservations, setReservations] = useState<any>([]);
 
-  const selectedDayTime = dayjs(selectedDay).format("YYYY-MM-DD");
+  const selectedDayTime = formatWithUserTimeZone(
+    false,
+    selectedDay,
+    "YYYY-MM-DD"
+  );
 
-  const handleReservation = (startTime, endTime) => {
-    const startDateTime = dayjs(`${selectedDayTime} ${startTime}`, {
-      locale: "es",
+  const handleReservation = (startTime: string, endTime: string) => {
+    const newReservations = TIME_SCHOOL.filter((time) => {
+      const timeStart = formatWithUserTimeZone(
+        true,
+        `${selectedDayTime} ${time.startTime}`
+      );
+      const timeEnd = formatWithUserTimeZone(
+        true,
+        `${selectedDayTime} ${time.endTime}`
+      );
+
+      const selectedDayTimeStart = formatWithUserTimeZone(
+        true,
+        `${selectedDayTime} ${startTime}`
+      );
+      const selectedDayTimeEnd = formatWithUserTimeZone(
+        true,
+        `${selectedDayTime} ${endTime}`
+      );
+
+      return (
+        (timeStart.isSameOrAfter(selectedDayTimeStart) ||
+          timeStart.isSame(selectedDayTimeEnd)) &&
+        timeEnd.isSameOrBefore(selectedDayTimeEnd)
+      );
     });
-    const endDateTime = dayjs(`${selectedDayTime} ${endTime}`, {
-      locale: "es",
-    });
 
-    const differenceInMinutes = endDateTime.diff(
-      startDateTime,
-      "minute"
-    );
-
-    if (differenceInMinutes >= 0) {
-      const newReservations = TIME_SCHOOL.filter((time) => {
-        const timeStart = dayjs(
-          `${selectedDayTime} ${time.startTime}`,
-          {
-            locale: "es",
-          }
-        );
-        const timeEnd = dayjs(`${selectedDayTime} ${time.endTime}`, {
-          locale: "es",
-        });
-
-        const selectedDayTimeStart = dayjs(
-          `${selectedDayTime} ${startTime}`
-        );
-        const selectedDayTimeEnd = dayjs(
-          `${selectedDayTime} ${endTime}`
-        );
-
-        return (
-          (timeStart.isSameOrAfter(selectedDayTimeStart) ||
-            timeStart.isSame(selectedDayTimeEnd)) &&
-          timeEnd.isSameOrBefore(selectedDayTimeEnd)
-        );
-      });
-
-      // eslint-disable-next-line
-      setReservations((prevReservations: any) => [
-        ...prevReservations,
-        ...newReservations,
-      ]);
-    } else {
-      console.log("Rango de tiempo no valido");
-    }
+    // eslint-disable-next-line
+    setReservations((prevReservations: any) => [
+      ...prevReservations,
+      ...newReservations,
+    ]);
   };
 
   // eslint-disable-next-line
-  function parseTime(time: any) {
-    const [hour, minute, period] = time.split(/:| /);
-    const adjustedHour =
-      period === "PM" && hour !== "12"
-        ? parseInt(hour) + 12
-        : parseInt(hour);
-    return adjustedHour * 60 + parseInt(minute);
+  function parseTime(timeStr: string): Date | null {
+    const matchResult = timeStr.match(/(\d{2}):(\d{2}) (am|pm)/i);
+
+    if (!matchResult) {
+      console.error("Formato de tiempo no válido:", timeStr);
+      return null;
+    }
+
+    const [hours, minutes, meridiem] = matchResult.slice(1);
+    let parsedHours = parseInt(hours, 10);
+
+    // Convertir las horas a formato de 24 horas si es PM
+    if (meridiem.toLowerCase() === "pm" && parsedHours !== 12) {
+      parsedHours += 12;
+    } else if (
+      meridiem.toLowerCase() === "am" &&
+      parsedHours === 12
+    ) {
+      parsedHours = 0;
+    }
+
+    const result = new Date();
+    result.setHours(parsedHours, parseInt(minutes, 10), 0, 0);
+    return result;
   }
 
   useEffect(() => {
@@ -205,19 +240,34 @@ export default function Details() {
     if (hoursToBooking.length > 1) {
       const minStartTimeObj = hoursToBooking.reduce(
         (min, current) => {
-          const minTime = parseTime(min.startTime);
-          const currentTime = parseTime(current.startTime);
-          return minTime < currentTime ? min : current;
+          // eslint-disable-next-line
+          const minTime: any = parseTime(min.startTime);
+          // eslint-disable-next-line
+          const currentTime: any = parseTime(current.startTime);
+          return minTime.getTime() < currentTime.getTime()
+            ? min
+            : current;
         }
       );
+
       const maxEndTimeObj = hoursToBooking.reduce((max, current) => {
-        const maxTime = parseTime(max.endTime);
-        const currentTime = parseTime(current.endTime);
-        return maxTime > currentTime ? max : current;
+        // eslint-disable-next-line
+        const maxTime: any = parseTime(max.endTime);
+        // eslint-disable-next-line
+        const currentTime: any = parseTime(current.endTime);
+        return maxTime.getTime() > currentTime.getTime()
+          ? max
+          : current;
       });
 
       const minStartTime = minStartTimeObj.startTime;
       const maxEndTime = maxEndTimeObj.endTime;
+
+      setDataToBooking({
+        ...dataToBooking,
+        startTime: minStartTime,
+        endTime: maxEndTime,
+      });
 
       handleReservation(minStartTime, maxEndTime);
     }
@@ -225,6 +275,52 @@ export default function Details() {
   }, [hoursToBooking]);
 
   const bookingSchedule = getSchedule(reservations);
+
+  const handleCreateReservation = async () => {
+    const startTime = formatWithUserTimeZone(
+      true,
+      `${dataToBooking.selectedDay} ${dataToBooking.startTime}`
+    );
+    const endTime = formatWithUserTimeZone(
+      true,
+      `${dataToBooking.selectedDay} ${dataToBooking.endTime}`
+    );
+
+    const reservationsExisting = await getAllBookingsBySchool(+id!);
+    const dataToCreateBooking = {
+      schoolId: +id!,
+      startTime: dayjs.utc(startTime).format(),
+      endTime: dayjs.utc(endTime).format(),
+      userId: 1,
+      boats: [+boatSelected],
+    };
+
+    const existBookingHere = canMakeReservation(
+      formatWithUserTimeZone,
+      reservationsExisting,
+      {
+        startTime,
+        endTime,
+        boats: [boatSelected],
+      }
+    );
+
+    if (existBookingHere) {
+      return toast.error("Its not possible to create booking");
+    }
+
+    const response = await createBooking(dataToCreateBooking);
+
+    if (response) {
+      toast.success("Booking created");
+      setShowModalBooking(false);
+      setShowModalBoat(false);
+      navigate("/bookings");
+      return;
+    }
+
+    toast.error("Something went wrong. Try again");
+  };
 
   if (school.isLoading) return <div>loading..</div>;
   if (school.isError) return <div>something went wrong</div>;
@@ -303,11 +399,26 @@ export default function Details() {
         <div className="flex items-center justify-between mt-4">
           <button
             onClick={() => {
-              const dateSubtrack = dayjs(selectedDay).subtract(
-                1,
-                "day"
+              const dateSubtrack = formatWithUserTimeZone(
+                true,
+                selectedDay
+              ).subtract(1, "day");
+
+              setSelectedDay(
+                formatWithUserTimeZone(
+                  false,
+                  dateSubtrack,
+                  "YYYY-MM-DD"
+                )
               );
-              setSelectedDay(dayjs(dateSubtrack).format());
+              setDataToBooking({
+                ...dataToBooking,
+                selectedDay: formatWithUserTimeZone(
+                  false,
+                  dateSubtrack,
+                  "YYYY-MM-DD"
+                ),
+              });
             }}
             className="p-2"
           >
@@ -329,13 +440,34 @@ export default function Details() {
               valueHeight <= 740 ? "text-base" : "text-lg"
             } font-bold text-darkBlue`}
           >
-            {dayjs(selectedDay).format("MMMM DD YYYY")}
+            {formatWithUserTimeZone(
+              false,
+              selectedDay,
+              "MMMM DD YYYY"
+            )}
           </span>
           <button
             className="p-2"
             onClick={() => {
-              const dateSubtrack = dayjs(selectedDay).add(1, "day");
-              setSelectedDay(dayjs(dateSubtrack).format());
+              const dateSubtrack = formatWithUserTimeZone(
+                true,
+                selectedDay
+              ).add(1, "day");
+              setSelectedDay(
+                formatWithUserTimeZone(
+                  false,
+                  dateSubtrack,
+                  "YYYY-MM-DD"
+                )
+              );
+              setDataToBooking({
+                ...dataToBooking,
+                selectedDay: formatWithUserTimeZone(
+                  false,
+                  dateSubtrack,
+                  "YYYY-MM-DD"
+                ),
+              });
             }}
           >
             <svg
@@ -365,32 +497,31 @@ export default function Details() {
           {/* eslint-disable-next-line */}
           {TIME_SCHOOL.map((time: any, index: number) => {
             return (
-              <div
-                key={index}
-                onClick={() => {
-                  if (reservations.length > 2) {
-                    setHoursToBooking([]);
-                    setReservations([]);
-                    return;
-                  }
-
-                  if (hoursToBooking.includes(time)) {
-                    setHoursToBooking((prevValue) =>
-                      prevValue.filter(
-                        (item) => item.startTime !== time.startTime
-                      )
-                    );
-                    return;
-                  }
-
-                  setHoursToBooking([...hoursToBooking, time]);
-                }}
-              >
+              <div key={index}>
                 <CardBookingHours
                   variant="AVAILABLE"
                   reservations={reservations}
                   startTime={time.startTime}
                   endTime={time.endTime}
+                  schoolId={+id!}
+                  onClick={() => {
+                    if (reservations.length > 2) {
+                      setHoursToBooking([]);
+                      setReservations([]);
+                      return;
+                    }
+
+                    if (hoursToBooking.includes(time)) {
+                      setHoursToBooking((prevValue) =>
+                        prevValue.filter(
+                          (item) => item.startTime !== time.startTime
+                        )
+                      );
+                      return;
+                    }
+
+                    setHoursToBooking([...hoursToBooking, time]);
+                  }}
                 />
               </div>
             );
@@ -575,23 +706,29 @@ export default function Details() {
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-3">
-          {boats.map((boat) => (
-            <div
-              key={boat}
-              className={`rounded-md ring-[3px] ring-offset-2 ${
-                boat === boatSelected
-                  ? "ring-darkBlue"
-                  : "ring-transparent"
-              }`}
-              onClick={() =>
-                boat === boatSelected
-                  ? setBoatSelected("")
-                  : setBoatSelected(boat)
-              }
-            >
-              <CardBoat />
-            </div>
-          ))}
+          {boats.isLoading ? (
+            <div>loading..</div>
+          ) : boats.isError ? (
+            <div>something went wrong</div>
+          ) : (
+            boats?.data.map((boat) => (
+              <div
+                key={boat.id}
+                className={`rounded-md ring-[3px] ring-offset-2 ${
+                  boat.id === boatSelected
+                    ? "ring-darkBlue"
+                    : "ring-transparent"
+                }`}
+                onClick={() =>
+                  boat.id !== boatSelected
+                    ? setBoatSelected(boat.id)
+                    : setBoatSelected(0)
+                }
+              >
+                <CardBoat boat={boat} />
+              </div>
+            ))
+          )}
         </div>
 
         <div className="-mx-1 flex items-center justify-between mt-4">
@@ -655,12 +792,7 @@ export default function Details() {
           className={`${
             !boatSelected ? "opacity-60" : "opacity-100"
           } font-medium mt-4 h-[50px] bg-darkBlue text-white rounded-md grid place-items-center w-full`}
-          onClick={() => {
-            setShowModalBooking(false);
-            setShowModalBoat(true);
-            toast.success("Reservation created!");
-            navigate("/bookings");
-          }}
+          onClick={handleCreateReservation}
         >
           Select
         </button>
@@ -683,7 +815,17 @@ export default function Details() {
         <button
           className="h-[50px] text-sm rounded-md bg-white text-darkBlue font-bold"
           onClick={() => {
-            setSelectedDay(dayjs().format());
+            setSelectedDay(
+              formatWithUserTimeZone(false, new Date(), "YYYY-MM-DD")
+            );
+            setDataToBooking({
+              ...dataToBooking,
+              selectedDay: formatWithUserTimeZone(
+                false,
+                new Date(),
+                "YYYY-MM-DD"
+              ),
+            });
             setShowModalBooking(true);
           }}
         >
@@ -823,16 +965,34 @@ export default function Details() {
             <button
               key={day}
               className={`${
-                dayjs(day).isBefore(today, "day")
+                formatWithUserTimeZone(true, day).isBefore(
+                  today,
+                  "day"
+                )
                   ? "bg-lightBlue"
                   : today === day
                   ? "bg-darkBlue"
                   : "border-darkBlue/50 border"
               } rounded-md grid place-items-center h-11 w-full`}
               onClick={() => {
-                if (dayjs(day).isBefore(today, "day")) return;
-
-                setSelectedDay(dayjs(day).format());
+                if (
+                  formatWithUserTimeZone(true, day).isBefore(
+                    today,
+                    "day"
+                  )
+                )
+                  return;
+                setSelectedDay(
+                  formatWithUserTimeZone(true, day).format()
+                );
+                setDataToBooking({
+                  ...dataToBooking,
+                  selectedDay: formatWithUserTimeZone(
+                    false,
+                    day,
+                    "YYYY-MM-DD"
+                  ),
+                });
                 setShowModalBooking(true);
               }}
             >
@@ -841,7 +1001,7 @@ export default function Details() {
                   today === day ? "text-white" : "text-darkBlue"
                 } font-bold`}
               >
-                {dayjs(day).format("DD")}
+                {formatWithUserTimeZone(false, day, "DD")}
               </span>
             </button>
           ))}

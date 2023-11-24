@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import dayjs from "dayjs";
 
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { DataReservationContext } from "../context/DataReservation";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrBefore);
@@ -39,6 +40,10 @@ const Calendar = ({
   const today = dayjs().startOf("day");
   const [currentMonth, setCurrentMonth] = useState(
     today.format("YYYY-MM-DD")
+  );
+
+  const { dataToBooking, setDataToBooking } = useContext(
+    DataReservationContext
   );
 
   const [firstDayCurrentMonth, setFirstDayCurrentMonth] =
@@ -141,6 +146,7 @@ const Calendar = ({
         <p className="text-center font-bold mb-3">F</p>
         <p className="text-center font-bold mb-3">S</p>
       </div>
+
       <div className="grid grid-cols-7 gap-x-2 gap-y-1">
         {/* eslint-disable-next-line */}
         {days?.map((day: any, index: number) => {
@@ -148,6 +154,10 @@ const Calendar = ({
             <div
               onClick={() => {
                 setSelectedDay(dayjs(day).format("YYYY-MM-DD"));
+                setDataToBooking({
+                  ...dataToBooking,
+                  selectedDay: dayjs(day).format("YYYY-MM-DD"),
+                });
                 setShowModalCalendar(false);
                 setShowModalBooking(true);
               }}

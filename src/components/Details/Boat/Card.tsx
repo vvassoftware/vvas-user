@@ -1,8 +1,17 @@
-export default function Card() {
+// eslint-disable-next-line
+export default function Card({ boat }: any) {
   return (
     <div
-      className={`bg-[url('/images/boat-image.jpg')] bg-cover bg-center rounded-md after:w-full after:h-full after:absolute after:bg-neutral-950/60 after:top-0 after:left-0 relative after:rounded-md h-[140px] w-full`}
+      className={`rounded-md after:w-full after:h-full after:absolute after:bg-neutral-950/60 after:top-0 after:left-0 relative after:rounded-md h-[140px] w-full`}
     >
+      <div className="w-full h-full absolute inset-0">
+        <img
+          src={boat?.image}
+          alt={boat?.name}
+          className="w-full h-full object-cover"
+        />
+      </div>
+
       <div className="absolute z-50 top-2 right-2 flex items-center gap-x-1">
         <svg
           width="11"
@@ -22,7 +31,7 @@ export default function Card() {
 
       <div className="bottom-2 left-2 z-50 absolute">
         <p className="text-white font-medium mb-[3px]">
-          Nautique s23
+          {boat?.name}
         </p>
 
         <div className="flex items-center gap-x-1">

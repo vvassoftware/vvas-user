@@ -5,6 +5,9 @@ import Input from "../../ui/Input";
 import { useHeight } from "../../hooks/useHeight";
 import { createUser } from "../../actions/user";
 import toast from "react-hot-toast";
+import { login } from "../../helpers/user";
+import { useContext } from "react";
+import { UserAuthContext } from "../../context/UserAuth";
 
 export type InputRegister = {
   name?: string;
@@ -13,6 +16,7 @@ export type InputRegister = {
   password: string;
   repeatPassword?: string;
   type?: string;
+  address?: string;
 };
 
 export default function Register({
@@ -21,6 +25,7 @@ export default function Register({
   setView: (value: string) => void;
 }) {
   const navigate = useNavigate();
+  const { setUser } = useContext(UserAuthContext);
 
   const stylesHeight = useHeight();
   const heightOfWindow = +stylesHeight.height.split("rem")[0] * 16;
@@ -44,10 +49,11 @@ export default function Register({
         email,
         password,
         type: "user",
+        address: "",
       });
+      await login(user?.access_token, setUser);
       toast.success("Account created successfully");
       navigate("/");
-      localStorage.setItem("access_token", user?.access_token);
       // eslint-disable-next-line
     } catch (error: any) {
       toast.error(error.response.data.message as string);
