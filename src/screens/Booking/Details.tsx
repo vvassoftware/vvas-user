@@ -279,7 +279,12 @@ export default function Details() {
   }, [hoursToBooking]);
 
   const bookingSchedule = getSchedule(reservations);
+
   const credits = useCredits(user?.id);
+  const creditsOfSchool = credits.data?.find(
+    // eslint-disable-next-line
+    (credit: any) => credit.school.id === +id!
+  )?.value;
 
   const handleCreateReservation = async () => {
     const startTime = formatWithUserTimeZone(
@@ -317,6 +322,7 @@ export default function Details() {
       return toast.error("Its not possible to create booking");
     }
 
+    // consulting about credits
     const existRegisterOfCredit = credits?.data.find(
       // eslint-disable-next-line
       (credit: any) => +credit.school.id === +id!
@@ -842,10 +848,16 @@ export default function Details() {
       <div className="p-[10px] items-center grid grid-cols-[1fr,120px] gap-x-2 z-[100] fixed bottom-0 left-0 bg-darkBlue w-full h-[100px]">
         <div>
           <p className="text-white text-sm">
-            You have <span className="font-bold">7 h</span> remaning
+            You have{" "}
+            <span className="font-bold">
+              {creditsOfSchool || 0} h
+            </span>{" "}
+            remaning
           </p>
           <p className="text-white mt-[3px] text-sm">
-            <span className="font-bold">Open from:</span> 05am to 08pm
+            <span className="font-bold">Open from:</span>{" "}
+            {dayjs(school.data.startTime).format("hh a")} to{" "}
+            {dayjs(school.data.endTime).format("hh a")}
           </p>
         </div>
 
