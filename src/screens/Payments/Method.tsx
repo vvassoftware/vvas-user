@@ -1,9 +1,12 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { FieldValues, useForm } from "react-hook-form";
+import { useContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useLocation, useNavigate } from "react-router-dom";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 import BackButton from "../../components/BackButton";
 import Input from "../../ui/Input";
+import { createCredit } from "../../actions/credit";
+import { UserAuthContext } from "../../context/UserAuth";
 
 enum ENUM_METHOD {
   VENMO = "VENMO",
@@ -20,12 +23,50 @@ export type InputMethodPayments = {
 
 export default function Method() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useContext(UserAuthContext);
 
   const [methodSelected, setMethodSelected] = useState<ENUM_METHOD>(
-    ENUM_METHOD.VENMO
+    ENUM_METHOD.CREDIT_CARD
   );
 
-  const { register } = useForm<FieldValues>();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<InputMethodPayments>({
+    defaultValues: {
+      name: "",
+      lastname: "",
+      expiration: "",
+      cvv: "",
+    },
+  });
+
+  const handleCreateCredit: SubmitHandler<
+    InputMethodPayments
+  > = async () => {
+    try {
+      const response = await createCredit({
+        schoolId: location.state.schoolId,
+        value: location.state.value,
+        userId: user.id,
+      });
+
+      if (response) {
+        toast.success("Purchased credit");
+        navigate("/hours-remaining");
+        return;
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  };
 
   return (
     <div>
@@ -109,30 +150,75 @@ export default function Method() {
             Credit card details
           </h2>
 
-          <div className="mt-3 flex flex-col gap-y-3">
-            <Input register={register} id="name" placeholder="Name" />
-            <Input
-              register={register}
-              id="lastname"
-              placeholder="Lastname"
-            />
-
-            <div className="grid grid-cols-2 gap-x-3">
+          <form
+            onSubmit={handleSubmit(handleCreateCredit)}
+            className="mt-3 flex flex-col gap-y-3"
+          >
+            <div>
               <Input
                 register={register}
-                id="expiration"
-                placeholder="Expiration date"
+                required={true}
+                id="name"
+                placeholder="Name"
               />
-              <Input register={register} id="cvv" placeholder="CVV" />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">
+                  Name is required
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Input
+                register={register}
+                id="lastname"
+                placeholder="Lastname"
+                required={true}
+              />
+              {errors.lastname && (
+                <p className="text-red-500 text-sm mt-1">
+                  Lastname is required
+                </p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-3">
+              <div>
+                <Input
+                  register={register}
+                  id="expiration"
+                  required={true}
+                  placeholder="Expiration date"
+                />
+                {errors.expiration && (
+                  <p className="text-red-500 text-sm mt-1">
+                    Expiration is required
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Input
+                  register={register}
+                  id="cvv"
+                  required={true}
+                  placeholder="CVV"
+                />
+                {errors.cvv && (
+                  <p className="text-red-500 text-sm mt-1">
+                    CVV is required
+                  </p>
+                )}
+              </div>
             </div>
 
             <button
-              onClick={() => navigate("ticket")}
+              type="submit"
               className="mt-2 h-[50px] bg-darkBlue text-white font-medium text-lg rounded-md"
             >
               Complete purchase
             </button>
-          </div>
+          </form>
         </div>
       )}
     </div>

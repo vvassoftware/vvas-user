@@ -2,16 +2,20 @@ import { useNavigate } from "react-router-dom";
 
 interface BackButtonProps {
   title: string;
+  onClick?: () => void;
 }
 
-export default function BackButton({ title }: BackButtonProps) {
+export default function BackButton({
+  title,
+  onClick,
+}: BackButtonProps) {
   const navigate = useNavigate();
 
   return (
     <div className="flex items-center gap-x-4">
       <button
         className="bg-darkBlue h-12 w-12 rounded-md grid place-items-center"
-        onClick={() => navigate(-1)}
+        onClick={onClick ? onClick : () => navigate(-1)}
       >
         <svg
           width="7"

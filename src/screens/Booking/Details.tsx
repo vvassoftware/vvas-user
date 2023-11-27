@@ -46,6 +46,7 @@ export default function Details() {
   );
 
   const { formatWithUserTimeZone } = useContext(TimeZoneContext);
+  const params = useParams();
 
   const today = formatWithUserTimeZone(true, new Date());
 
@@ -918,7 +919,8 @@ export default function Details() {
                   <PackagesCard
                     key={index}
                     price={packageData.price}
-                    hours={packageData.hours}
+                    value={packageData.value}
+                    schoolId={params.id as string}
                   />
                 </div>
               )
