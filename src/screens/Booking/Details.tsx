@@ -37,6 +37,8 @@ import {
 import { canMakeReservation } from "../../helpers/canMakeReservation";
 import { useBoats } from "../../actions/boats";
 import { TimeZoneContext } from "../../context/TimezoneContext";
+import { UserAuthContext } from "../../context/UserAuth";
+import { updateCredit, useCredits } from "../../actions/credit";
 
 export default function Details() {
   const navigate = useNavigate();
@@ -44,6 +46,7 @@ export default function Details() {
   const { dataToBooking, setDataToBooking } = useContext(
     DataReservationContext
   );
+  const { user } = useContext(UserAuthContext);
 
   const { formatWithUserTimeZone } = useContext(TimeZoneContext);
   const params = useParams();
@@ -276,6 +279,7 @@ export default function Details() {
   }, [hoursToBooking]);
 
   const bookingSchedule = getSchedule(reservations);
+  const credits = useCredits(user?.id);
 
   const handleCreateReservation = async () => {
     const startTime = formatWithUserTimeZone(
@@ -306,11 +310,43 @@ export default function Details() {
       }
     );
 
+    const diffHours =
+      dayjs.utc(endTime).diff(dayjs.utc(startTime), "minutes") / 60;
+
     if (existBookingHere) {
       return toast.error("Its not possible to create booking");
     }
 
+    const existRegisterOfCredit = credits?.data.find(
+      // eslint-disable-next-line
+      (credit: any) => +credit.school.id === +id!
+    );
+
+    if (!existRegisterOfCredit) {
+      toast.error("You do not have purchased credits");
+      return;
+    }
+
+    if (existRegisterOfCredit?.value < diffHours) {
+      toast.error("You don't have enough credits");
+      return;
+    }
+
+    const dataCreditToUpdate = {
+      value: existRegisterOfCredit?.value - diffHours,
+    };
+
+    const responseCredits = await updateCredit(
+      existRegisterOfCredit?.id,
+      dataCreditToUpdate
+    );
+
     const response = await createBooking(dataToCreateBooking);
+
+    if (!responseCredits) {
+      toast.error("Something went wrong. Try again");
+      return;
+    }
 
     if (response) {
       toast.success("Booking created");

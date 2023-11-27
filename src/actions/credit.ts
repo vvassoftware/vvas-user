@@ -21,6 +21,17 @@ export const getAllCredits = async (userId: string) => {
   return response.data;
 };
 
+// eslint-disable-next-line
+export const updateCredit = async (id: string, data: any) => {
+  const response = await axios({
+    method: "PATCH",
+    url: `api/credit/${id}`,
+    data: JSON.stringify(data),
+  });
+
+  return response.data;
+};
+
 export const useCredits = (userId: string) => {
   const { data, isError, isLoading } = useQuery({
     queryKey: ["get-all-credits", userId],
