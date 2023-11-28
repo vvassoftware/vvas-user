@@ -1,7 +1,7 @@
-const image =
-  "https://images.unsplash.com/photo-1502933691298-84fc14542831?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+import dayjs from "dayjs";
 
-export default function Card() {
+// eslint-disable-next-line
+export default function Card({ booking }: any) {
   return (
     <div
       role="button"
@@ -9,25 +9,34 @@ export default function Card() {
     >
       <div className="w-[150px] h-full">
         <img
-          src={image}
+          src={booking.school.image}
           alt=""
           className="w-full object-cover h-full"
         />
       </div>
       <div className="flex flex-col h-full justify-between">
         <div className="p-[10px] flex flex-col items-start">
-          <h3 className="text-white text-sm">Water Sport School</h3>
-          <p className="text-xs text-white">Orlando, Florida</p>
+          <h3 className="text-white text-sm font-semibold">
+            {booking.school.name}
+          </h3>
+          <p className="text-xs text-white">
+            {booking.school.locationName}
+          </p>
         </div>
 
         <div className="p-[10px]">
           <div className="flex gap-x-1 justify-start">
             <p className="text-xs font-bold text-white">Date:</p>
-            <p className="text-xs text-white">December 2, 2021</p>
+            <p className="text-xs text-white">
+              {dayjs(booking.startTime).format("MMMM DD, YYYY")}
+            </p>
           </div>
           <div className="flex gap-x-1 justify-start">
             <p className="text-xs font-bold text-white">Time:</p>
-            <p className="text-xs text-white">03 to 05 PM</p>
+            <p className="text-xs text-white">
+              {dayjs(booking.startTime).format("hh:mm a")} to{" "}
+              {dayjs(booking.endTime).format("hh:mm a")}
+            </p>
           </div>
         </div>
       </div>

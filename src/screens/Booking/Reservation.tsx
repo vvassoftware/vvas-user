@@ -1,6 +1,19 @@
+import { useParams } from "react-router-dom";
+import { MapContainer } from "react-leaflet/MapContainer";
+import { TileLayer } from "react-leaflet/TileLayer";
+import { Marker } from "react-leaflet/Marker";
+import { Popup } from "react-leaflet/Popup";
+
+import { useSchool } from "../../actions/school";
 import BackButton from "../../components/BackButton";
 
 export default function Reservation() {
+  const { id } = useParams();
+  const school = useSchool(+id! as number);
+
+  if (school.isLoading) return <div>Loading..</div>;
+  if (school.isError) return <div>Something went wrong..</div>;
+
   return (
     <div>
       <header className="p-5">
@@ -11,7 +24,7 @@ export default function Reservation() {
 
       <div className="px-5">
         <img
-          src="/images/booking-cover.png"
+          src={school.data.image}
           alt=""
           className="w-full h-[200px] object-cover rounded-md"
         />
@@ -19,11 +32,7 @@ export default function Reservation() {
           Orlando, Florida
         </p>
         <p className="text-neutral-700 mt-2">
-          At WATER SPORT SCHOOL you pay hourly for the boat with all
-          you need included. One on one coaching for surf, ski,
-          wakeboard and foil. You can bring up to 13 people and ski,
-          surf, foil, wakeboard, tube, go for a sunset cocktail cruise
-          or just hang out with your friends and family!
+          {school.data.description}
         </p>
       </div>
 
@@ -33,14 +42,28 @@ export default function Reservation() {
         </h3>
 
         <div className="mt-3">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7006.719071067462!2d-81.3455164!3d28.588989!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88e77004001920d3%3A0xb8d10c765ef46993!2sLake%20Virginia!5e0!3m2!1ses!2spy!4v1700156836417!5m2!1ses!2spy"
-            width="100%"
-            height="260"
-            style={{ border: 0 }}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
+          <MapContainer
+            center={[
+              school.data.coords[0].latitude,
+              school.data.coords[0].longitude,
+            ]}
+            zoom={14}
+            scrollWheelZoom={false}
+            style={{ height: 300 }}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker
+              position={[
+                school.data.coords[0].latitude,
+                school.data.coords[0].longitude,
+              ]}
+            >
+              <Popup>{/* <FaMarker /> */}</Popup>
+            </Marker>
+          </MapContainer>
         </div>
       </div>
 
@@ -50,10 +73,7 @@ export default function Reservation() {
         </h3>
 
         <div className="mt-3 mb-5">
-          <p className="text-darkBlue">
-            Parking at this location is FREE is you book with us. You
-            will even get preference if the park is full.
-          </p>
+          <p className="text-darkBlue">{school.data.obs}</p>
         </div>
       </div>
 
@@ -67,9 +87,11 @@ export default function Reservation() {
             <div className="w-12 h-12 bg-lightBlue rounded-full"></div>
             <div>
               <h4 className="text-sm font-bold text-darkBlue">
-                Edmund Preston
+                {school.data.owner.name} {school.data.owner.lastname}
               </h4>
-              <p className="text-sm text-darkBlue">Florida, Miami</p>
+              <p className="text-sm text-darkBlue">
+                {school.data.locationName}
+              </p>
             </div>
           </div>
 

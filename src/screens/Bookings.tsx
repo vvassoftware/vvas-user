@@ -1,18 +1,21 @@
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Layout from "../components/Layout";
 import Card from "../components/Bookings/Card";
 import Exclamation from "../components/Illustrations/Exclamation";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useBookingsByUser } from "../actions/booking";
+import { UserAuthContext } from "../context/UserAuth";
 
 export default function Bookings() {
   const navigate = useNavigate();
-  const [isLogged, setIsLogged] = useState<boolean>(false);
 
-  const bookings = isLogged ? [{}, {}, {}] : [];
+  const { user } = useContext(UserAuthContext);
 
-  useEffect(() => {
-    setIsLogged(localStorage.getItem("access_token") ? true : false);
-  }, []);
+  const bookings = useBookingsByUser(user?.id);
+
+  if (bookings.isLoading) return <div>Loading...</div>;
+  if (bookings.isError) return <div>Something went wrong</div>;
 
   return (
     <Layout>
@@ -22,7 +25,7 @@ export default function Bookings() {
         </h2>
       </header>
       <div className="flex flex-col gap-y-5 px-5 mb-5">
-        {bookings.length === 0 ? (
+        {bookings.data.length === 0 ? (
           <div className="grid place-items-center h-[calc(100vh_-_149px_-_20px)]">
             <div className="flex flex-col items-center">
               <Exclamation />
@@ -38,12 +41,15 @@ export default function Bookings() {
             </div>
           </div>
         ) : (
-          bookings.map((_, index: number) => (
+          // eslint-disable-next-line
+          bookings.data.map((booking: any, index: number) => (
             <button
               key={index}
-              onClick={() => navigate("/booking/reservation/1")}
+              onClick={() =>
+                navigate(`/booking/reservation/${booking.school.id}`)
+              }
             >
-              <Card />
+              <Card booking={booking} />
             </button>
           ))
         )}

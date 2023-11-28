@@ -9,13 +9,6 @@ import { TileLayer } from "react-leaflet/TileLayer";
 import { Marker } from "react-leaflet/Marker";
 import { Popup } from "react-leaflet/Popup";
 
-// import {
-//   MapContainer,
-//   TileLayer,
-//   Marker,
-//   Popup,
-// } from "react-leaflet";
-
 import BackButton from "../../components/BackButton";
 import ActivitiesCard from "../../components/Home/Activities/Card";
 import PackagesCard from "../../components/Home/Packages/Card";
@@ -39,6 +32,7 @@ import { useBoats } from "../../actions/boats";
 import { TimeZoneContext } from "../../context/TimezoneContext";
 import { UserAuthContext } from "../../context/UserAuth";
 import { updateCredit, useCredits } from "../../actions/credit";
+import { genArrayTime } from "../../helpers/genArrayTime";
 
 export default function Details() {
   const navigate = useNavigate();
@@ -301,7 +295,7 @@ export default function Details() {
       schoolId: +id!,
       startTime: dayjs.utc(startTime).format(),
       endTime: dayjs.utc(endTime).format(),
-      userId: 1,
+      userId: user?.id,
       boats: [+boatSelected],
     };
 
@@ -367,6 +361,12 @@ export default function Details() {
 
   if (school.isLoading) return <div>loading..</div>;
   if (school.isError) return <div>something went wrong</div>;
+
+  const arrayTime = genArrayTime(
+    school.data.startTime,
+    school.data.endTime,
+    formatWithUserTimeZone
+  );
 
   return (
     <div className="mb-[128px]">
@@ -538,7 +538,7 @@ export default function Details() {
           } bg-lightBlue p-3 mt-4 -mx-1 rounded-md grid grid-cols-3 gap-2 overflow-y-auto`}
         >
           {/* eslint-disable-next-line */}
-          {TIME_SCHOOL.map((time: any, index: number) => {
+          {arrayTime?.map((time: any, index: number) => {
             return (
               <div key={index}>
                 <CardBookingHours
@@ -1138,9 +1138,11 @@ export default function Details() {
             <div className="w-12 h-12 bg-lightBlue rounded-full"></div>
             <div>
               <h4 className="text-sm font-bold text-darkBlue">
-                Edmund Preston
+                {school.data.owner.name} {school.data.owner.lastname}
               </h4>
-              <p className="text-sm text-darkBlue">Florida, Miami</p>
+              <p className="text-sm text-darkBlue">
+                {school.data.locationName}
+              </p>
             </div>
           </div>
 

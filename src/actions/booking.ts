@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import axios from "../config/axios";
 
 export const getAllBookingsBySchool = async (schoolId: number) => {
@@ -18,4 +19,40 @@ export const createBooking = async (data: any) => {
   });
 
   return response.data;
+};
+
+export const getAllBookingsByUser = async (userId: string) => {
+  const response = await axios({
+    method: "GET",
+    url: `/api/booking/all/${userId}`,
+  });
+
+  return response.data;
+};
+
+export const getAllOldBookingsByUser = async (userId: string) => {
+  const response = await axios({
+    method: "GET",
+    url: `/api/booking/all/old/${userId}`,
+  });
+
+  return response.data;
+};
+
+export const useBookingsByUser = (userId: string) => {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["get-bookings-by-user", userId],
+    queryFn: () => getAllBookingsByUser(userId),
+  });
+
+  return { data, isLoading, isError };
+};
+
+export const useBookingsOldByUser = (userId: string) => {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["get-bookings-old-by-user", userId],
+    queryFn: () => getAllOldBookingsByUser(userId),
+  });
+
+  return { data, isLoading, isError };
 };
