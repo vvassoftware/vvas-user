@@ -14,13 +14,13 @@ export const genArrayTime = (
   let currentHour = start;
 
   while (currentHour.isBefore(end) || currentHour.isSame(end)) {
-    const formattedHour = currentHour.format("hh:mm A");
+    const formattedHour = currentHour.format("hh:mm a");
 
     hoursArray.push({
       startTime: formattedHour,
       endTime: currentHour
         .add(intervalo, "minutes")
-        .format("hh:mm A"),
+        .format("hh:mm a"),
       id: hoursArray.length + 1,
     });
 
