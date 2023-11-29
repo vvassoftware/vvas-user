@@ -16,6 +16,7 @@ enum ENUM_METHOD {
 
 export type InputMethodPayments = {
   name: string;
+  accountNumber: string;
   lastname: string;
   expiration: string;
   cvv: string;
@@ -40,6 +41,7 @@ export default function Method() {
     formState: { errors },
   } = useForm<InputMethodPayments>({
     defaultValues: {
+      accountNumber: "",
       name: "",
       lastname: "",
       expiration: "",
@@ -154,7 +156,18 @@ export default function Method() {
             onSubmit={handleSubmit(handleCreateCredit)}
             className="mt-3 flex flex-col gap-y-3"
           >
-            <div>
+            <div className="space-y-3">
+              <Input
+                register={register}
+                required={true}
+                id="accountNumber"
+                placeholder="Account number"
+              />
+              {errors.accountNumber && (
+                <p className="text-red-500 text-sm mt-1">
+                  Name is required
+                </p>
+              )}
               <Input
                 register={register}
                 required={true}

@@ -26,6 +26,7 @@ import { DataReservationContext } from "../../context/DataReservation";
 import {
   createBooking,
   getAllBookingsBySchool,
+  useBookingsOldByUser,
 } from "../../actions/booking";
 import { canMakeReservation } from "../../helpers/canMakeReservation";
 import { useBoats } from "../../actions/boats";
@@ -33,6 +34,11 @@ import { TimeZoneContext } from "../../context/TimezoneContext";
 import { UserAuthContext } from "../../context/UserAuth";
 import { updateCredit, useCredits } from "../../actions/credit";
 import { genArrayTime } from "../../helpers/genArrayTime";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import {
+  createReview,
+  useGetAllReviewsBySchool,
+} from "../../actions/review";
 
 export default function Details() {
   const navigate = useNavigate();
@@ -55,6 +61,53 @@ export default function Details() {
   const { height } = useHeight();
   const valueHeight = +height.split("rem")[0] * 16;
 
+  // create review form
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    watch,
+    // formState: { errors },
+  } = useForm<FieldValues>({
+    defaultValues: {
+      stars: 0,
+      review: "",
+    },
+  });
+
+  const starsValue = watch("stars");
+
+  // reviews
+  const allReviews = useGetAllReviewsBySchool(id!);
+
+  const booking = useBookingsOldByUser(user?.id);
+
+  const handleCreateReview: SubmitHandler<FieldValues> = async (
+    data
+  ) => {
+    if (booking?.data.length <= 0) {
+      return toast.error("You cannot yet review the service");
+    }
+
+    const reviewDataToCreate = {
+      content: data.review,
+      stars: data.stars,
+      userId: user?.id,
+      schoolId: +id!,
+    };
+
+    const response = await createReview(reviewDataToCreate);
+
+    if (response) {
+      toast.success("Review created");
+      setShowModalReview(false);
+      allReviews.refetch();
+      return;
+    }
+
+    return toast.error("Something went wrong. Try again");
+  };
+
   const [showModalCalendar, setShowModalCalendar] =
     useState<boolean>(false);
   const [showModalBooking, setShowModalBooking] =
@@ -64,7 +117,6 @@ export default function Details() {
   const [showModalBoat, setShowModalBoat] = useState<boolean>(false);
 
   const [boatSelected, setBoatSelected] = useState<number>(0);
-  const [valueStars, setValueStars] = useState<number>(0);
 
   // eslint-disable-next-line
   const [hoursToBooking, setHoursToBooking] = useState<any[]>([]);
@@ -138,8 +190,9 @@ export default function Details() {
 
   useEffect(() => {
     setHoursToBooking([]);
-    setValueStars(0);
-  }, [showModalBooking, showModalReview]);
+    setValue("review", "");
+    setValue("stars", 0);
+  }, [showModalBooking, showModalReview, setValue]);
 
   useEffect(() => {
     setDataToBooking({
@@ -665,38 +718,56 @@ export default function Details() {
           </button>
         </div>
 
-        <div className="mt-4">
+        <form
+          onSubmit={handleSubmit(handleCreateReview)}
+          className="mt-4"
+        >
           <div className="flex items-center gap-x-2 mb-3 justify-center">
-            <button onClick={() => setValueStars(1)}>
-              {valueStars >= 1 ? (
+            <button
+              type="button"
+              onClick={() => setValue("stars", 1)}
+            >
+              {starsValue >= 1 ? (
                 <HiStar className="w-12 h-12 text-darkBlue" />
               ) : (
                 <HiOutlineStar className="w-12 h-12 text-darkBlue" />
               )}
             </button>
-            <button onClick={() => setValueStars(2)}>
-              {valueStars >= 2 ? (
+            <button
+              type="button"
+              onClick={() => setValue("stars", 2)}
+            >
+              {starsValue >= 2 ? (
                 <HiStar className="w-12 h-12 text-darkBlue" />
               ) : (
                 <HiOutlineStar className="w-12 h-12 text-darkBlue" />
               )}
             </button>
-            <button onClick={() => setValueStars(3)}>
-              {valueStars >= 3 ? (
+            <button
+              type="button"
+              onClick={() => setValue("stars", 3)}
+            >
+              {starsValue >= 3 ? (
                 <HiStar className="w-12 h-12 text-darkBlue" />
               ) : (
                 <HiOutlineStar className="w-12 h-12 text-darkBlue" />
               )}
             </button>
-            <button onClick={() => setValueStars(4)}>
-              {valueStars >= 4 ? (
+            <button
+              type="button"
+              onClick={() => setValue("stars", 4)}
+            >
+              {starsValue >= 4 ? (
                 <HiStar className="w-12 h-12 text-darkBlue" />
               ) : (
                 <HiOutlineStar className="w-12 h-12 text-darkBlue" />
               )}
             </button>
-            <button onClick={() => setValueStars(5)}>
-              {valueStars === 5 ? (
+            <button
+              type="button"
+              onClick={() => setValue("stars", 5)}
+            >
+              {starsValue === 5 ? (
                 <HiStar className="w-12 h-12 text-darkBlue" />
               ) : (
                 <HiOutlineStar className="w-12 h-12 text-darkBlue" />
@@ -707,12 +778,19 @@ export default function Details() {
           <p className="text-darkBlue mb-2 text-sm">
             Tell us about your experience! We are eager to listen:
           </p>
-          <textarea className="w-full resize-none h-[200px] rounded-md border border-darkBlue/50"></textarea>
+          <textarea
+            id="review"
+            {...register("review", { required: true })}
+            className="p-3 w-full resize-none h-[200px] rounded-md border border-darkBlue/50"
+          ></textarea>
 
-          <button className="mt-3 h-[50px] bg-darkBlue rounded-md text-white w-full grid-place-items-center">
+          <button
+            type="submit"
+            className="mt-3 h-[50px] bg-darkBlue rounded-md text-white w-full grid-place-items-center"
+          >
             Post review
           </button>
-        </div>
+        </form>
       </Modal>
 
       <Modal show={showModalBoat} setShow={setShowModalBoat}>
@@ -1121,12 +1199,30 @@ export default function Details() {
           </svg>
         </button>
 
-        {/* Lists reviews */}
-        <div className="mt-2">
-          {["", "", ""].map((_, index: number) => (
-            <Review key={index} />
-          ))}
+        <div>
+          {allReviews.isLoading ? (
+            <div>loading..</div>
+          ) : allReviews.isError ? (
+            <div>something went wrong</div>
+          ) : allReviews.data ? (
+            allReviews.data
+              .slice(0, 3)
+              .map((review) => (
+                <Review key={review.id} review={review} />
+              ))
+          ) : (
+            <div>no reviews available</div>
+          )}
         </div>
+
+        <button
+          className="text-white font-medium text-lg h-[50px] bg-darkBlue w-full rounded-md mt-5"
+          onClick={() =>
+            navigate("/reviews/all", { state: { schoolId: +id! } })
+          }
+        >
+          View all reviews
+        </button>
       </div>
 
       <div className="my-7 px-5">

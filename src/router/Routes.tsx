@@ -13,6 +13,7 @@ import Method from "../screens/Payments/Method";
 import Tickets from "../screens/Payments/Tickets";
 import Reservation from "../screens/Booking/Reservation";
 import Auth from "../screens/Auth";
+import AllReviews from "../screens/Reviews";
 
 export default function RoutesApp({
   children,
@@ -45,6 +46,7 @@ export default function RoutesApp({
         <Route path="/booking/:id" element={<Details />} />
         <Route path="/payments" element={<Method />} />
         <Route path="/payments/ticket" element={<Tickets />} />
+        <Route path="/reviews/all" element={<AllReviews />} />
       </Routes>
       <div>{children}</div>
     </BrowserRouter>
