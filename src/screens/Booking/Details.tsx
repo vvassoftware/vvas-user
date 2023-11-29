@@ -542,6 +542,7 @@ export default function Details() {
             return (
               <div key={index}>
                 <CardBookingHours
+                  selectedDay={selectedDay}
                   variant="AVAILABLE"
                   reservations={reservations}
                   startTime={time.startTime}
